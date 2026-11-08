@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Hardware-independent logic: configuration, identification, planning, verification, reporting. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Amwag.PrinterSetup.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Amwag.PrinterSetup.Core.Tests" />
+    <InternalsVisibleTo Include="Amwag.PrinterSetup.Testing" />
+  </ItemGroup>
+
+</Project>
+

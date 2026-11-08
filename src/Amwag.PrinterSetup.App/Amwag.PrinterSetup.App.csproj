@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>AMWAG Printer Setup</AssemblyName>
+    <RootNamespace>Amwag.PrinterSetup.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AmwagPrinterSetup.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
+    <ApplicationDefaultFont>Segoe UI, 9pt</ApplicationDefaultFont>
+    <AssemblyTitle>AMWAG Printer Setup</AssemblyTitle>
+    <Description>Detects, installs and configures TA Triumph-Adler ticket printers for AMWAG Travel branches.</Description>
+    <Company>AMWAG Travel · AMWAG IT Department</Company>
+    <Product>AMWAG Printer Setup</Product>
+    <Copyright>Copyright © 2026 AMWAG Travel · AMWAG IT Department. Developed by Eng. Abdelhmeed Elshorbagy (www.abdelhmeed.com).</Copyright>
+  </PropertyGroup>
+
+  <!-- Publish settings used by build.ps1 (self-contained, single file, x64). -->
+  <PropertyGroup>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Amwag.PrinterSetup.Core\Amwag.PrinterSetup.Core.csproj" />
+    <ProjectReference Include="..\Amwag.PrinterSetup.Windows\Amwag.PrinterSetup.Windows.csproj" />
+  </ItemGroup>
+
+  <!-- The approved deployment configuration is embedded (fallback) and also shipped next to the exe (editable by IT). -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\config\amwag-printer-config.json" LogicalName="amwag-printer-config.json" Link="Config\amwag-printer-config.json" />
+    <None Include="..\..\config\amwag-printer-config.json" Link="amwag-printer-config.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <!-- The master logo, drawn as vector paths by UI\BrandArt.cs. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\branding\amwag-mark.svg" LogicalName="Brand.amwag-mark.svg" Link="Branding\amwag-mark.svg" />
+    <EmbeddedResource Include="..\..\branding\amwag-logo.svg" LogicalName="Brand.amwag-logo.svg" Link="Branding\amwag-logo.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Amwag.PrinterSetup.App.Tests" />
+  </ItemGroup>
+
+</Project>
+

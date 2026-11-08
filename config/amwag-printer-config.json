@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "configVersion": "2026.11.05-1",
+  "ticket": {
+    "formName": "AMWAG Ticket",
+    "width": 3.27,
+    "height": 6.70,
+    "unit": "in",
+    "dimensionsConfirmed": true,
+    "confirmedBy": "Abdelhmeed Mohsen",
+    "confirmedOn": "2026-11-04",
+    "notes": "Measured ticket stock: 3.27 x 6.70 in = 83.058 x 170.18 mm."
+  },
+  "printPreferences": {
+    "orientation": "portrait",
+    "duplex": "simplex",
+    "scalePercent": 100,
+    "paperSource": "requireMultipurposeTray"
+  },
+  "connection": {
+    "newQueueName": "AMWAG Ticket Printer",
+    "rawPortNumber": 9100,
+    "snmpEnabled": true,
+    "snmpCommunity": "public",
+    "identifyExistingNetworkQueues": true,
+    "maxNetworkProbes": 8,
+    "networkTimeoutMilliseconds": 2000,
+    "usbQueueWaitSeconds": 90
+  },
+  "driverSource": {
+    "offlineFolder": "drivers",
+    "allowOnlineDownload": true,
+    "downloadTimeoutSeconds": 900
+  },
+  "models": [
+    {
+      "id": "P-4030DN",
+      "displayName": "TA Triumph-Adler P-4030DN",
+      "hardwareIds": [
+        "USBPRINT\\UTAX_TAP-4030DN1652",
+        "WSDPRINT\\UTAX_TAP-4030DN1652",
+        "LPTENUM\\UTAX_TAP-4030DN1652"
+      ],
+      "ieee1284Ids": [
+        { "manufacturer": "UTAX_TA", "model": "P-4030DN" }
+      ],
+      "networkModelNames": [ "P-4030DN" ],
+      "acceptedDrivers": [
+        { "name": "P-4030DN v4 KX (PCL6)" },
+        { "name": "P-4030DN v4 KX (XPS)" },
+        { "name": "P-4030DN KX", "listsWindowsForms": false }
+      ],
+      "preferredDriverName": "P-4030DN v4 KX (PCL6)",
+      "driverPackageId": "ta-kxv4-6.1.1603-pcl6",
+      "ticketPaperSource": {
+        "binIds": [ 4 ],
+        "binNames": [ "MP Tray", "Multipurpose tray" ],
+        "requiredForTicket": true
+      },
+      "multipurposeTrayRange": { "minWidth": 70, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "cassetteRange": { "minWidth": 140, "minHeight": 210, "maxWidth": 216, "maxHeight": 356 },
+      "specSource": "UTAX English operation guide P-4030D/DN family p.A-14/A-16 (TA German OG identical); KXv4 GPD/property bag utlp6220.bag",
+      "notes": "Hardware IDs and driver names verified in both official INFs (KXv4 6.1.1603 prnkycl1.inf [UTAX/TA.NTamd64]; KX 8.7.0917 64bit\\OEMSETUP.INF [TA/UTAX.NTamd64.6.0]). IEEE 1284 MFG/MDL split inferred from the hardware ID (UTAX_TA + P-4030DN). networkModelNames is the vendor installer's SNMP model id (KmInstall4.ini, Kyocera OID 1.3.6.1.4.1.1347.43.5.1.1.1.1), not yet confirmed on hardware. Kyocera equivalent: FS-2100DN. The ticket is narrower than the cassette minimum (140 mm), so only the MP tray can feed it."
+    },
+    {
+      "id": "P-4531DN",
+      "displayName": "TA Triumph-Adler P-4531DN",
+      "hardwareIds": [
+        "USBPRINT\\UTAX_TAP-4531DND6CF",
+        "WSDPRINT\\UTAX_TAP-4531DND6CF",
+        "LPTENUM\\UTAX_TAP-4531DND6CF"
+      ],
+      "ieee1284Ids": [
+        { "manufacturer": "UTAX_TA", "model": "P-4531DN" }
+      ],
+      "networkModelNames": [ "P-4531DN" ],
+      "acceptedDrivers": [
+        { "name": "P-4531DN v4 KX (PCL6)" },
+        { "name": "P-4531DN v4 KX (XPS)" },
+        { "name": "P-4531DN KX", "listsWindowsForms": false }
+      ],
+      "preferredDriverName": "P-4531DN v4 KX (PCL6)",
+      "driverPackageId": "ta-kxv4-6.1.1603-pcl6",
+      "ticketPaperSource": {
+        "binIds": [ 4 ],
+        "binNames": [ "MP Tray", "Multipurpose tray" ],
+        "requiredForTicket": true
+      },
+      "multipurposeTrayRange": { "minWidth": 70, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "cassetteRange": { "minWidth": 105, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "specSource": "TA English operation guide P-4531DN family p.A-14; KXv4 property bag utlp11720.bag; KX 8.7 UTLP11720.XML",
+      "notes": "LPTENUM ID appears in the KXv4 INF only; USBPRINT/WSDPRINT IDs appear in both official INFs. The UTAX datasheet limits the P-4531DN cassette to A5R and larger and the driver data gives a 140 x 210 mm cassette minimum; either way only the MP tray can feed the ticket. Kyocera equivalent: ECOSYS P3045dn (explicit in the TA EU declaration of conformity)."
+    },
+    {
+      "id": "P-5032DN",
+      "displayName": "TA Triumph-Adler P-5032DN",
+      "hardwareIds": [
+        "USBPRINT\\TA_UTAXP-5032DNEED0",
+        "WSDPRINT\\TA_UTAXP-5032DNEED0"
+      ],
+      "ieee1284Ids": [
+        { "manufacturer": "TA_UTAX", "model": "P-5032DN" },
+        { "manufacturer": "UTAX_TA", "model": "P-5032DN" }
+      ],
+      "networkModelNames": [ "P-5032DN" ],
+      "acceptedDrivers": [
+        { "name": "P-5032DN v4 KX (PCL6)" },
+        { "name": "P-5032DN v4 KX (XPS)" },
+        { "name": "P-5032DN KX", "listsWindowsForms": false }
+      ],
+      "preferredDriverName": "P-5032DN v4 KX (PCL6)",
+      "driverPackageId": "ta-kxv4-6.1.1603-pcl6",
+      "ticketPaperSource": {
+        "binIds": [ 4 ],
+        "binNames": [ "MP Tray", "Multipurpose tray" ],
+        "requiredForTicket": true
+      },
+      "multipurposeTrayRange": { "minWidth": 70, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "cassetteRange": { "minWidth": 105, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "specSource": "TA English operation guide P-4532DN/P-5032DN/P-5532DN Rev 1 p.11-21; KXv4 property bag utlp13920.bag; KX 8.7 UTLP13920.XML",
+      "notes": "Only USBPRINT/WSDPRINT IDs exist in the official INFs (TA_UTAXP-5032DNEED0). The vendor installer database (KmInstall4.ini) also lists UTAX_TAP-5032DNC673 for some units, hence the second IEEE 1284 pair (from vendor data, not the INF). The driver defaults to two-sided printing; the tool forces single-sided. The XPS package has a PrinterDriverID defect for this model; the PCL6 package is used. Kyocera equivalent: ECOSYS P3150dn."
+    }
+  ],
+  "driverPackages": [
+    {
+      "id": "ta-kxv4-6.1.1603-pcl6",
+      "displayName": "TA Triumph-Adler KX XPS Universal Print Driver (KXv4) 6.1.1603 - PCL6 driver",
+      "publisher": "TA Triumph-Adler / UTAX (Kyocera Document Solutions)",
+      "version": "6.1.1603",
+      "infDriverVer": "04/03/2023,6.1.1603.0",
+      "driverType": "Windows v4 printer driver (GPD-based, XPS to PCL XL filter), WHQL-signed",
+      "sourcePage": "https://www.triumph-adler.com/ta-en-de/hardware/office-printer/product/P-4030DN",
+      "downloadUrl": "https://www.triumph-adler.com/caas/v1/ta/media/103622/data/02a1879a81ae6c73a9753c16e9ab05aa/Kxv4_v6.1.1603_TA_RC7_WHQL.zip",
+      "fileName": "Kxv4_v6.1.1603_TA_RC7_WHQL.zip",
+      "sizeBytes": 155412996,
+      "sha256": "2226F16A2C5A8EC24B16266B24F8E73160A6C9CEFC2ACF46EFD2FFE922EA273A",
+      "environment": "Windows x64",
+      "architecture": "x64",
+      "infPath": "Kxv4_v6.1.1603_TA_RC7_WHQL/Kxv4_v6.1.1603_TA_RC7_WHQL/PrnDrv/PCL Driver/64bit/win81 and newer/prnkycl1.inf",
+      "catalogPath": "Kxv4_v6.1.1603_TA_RC7_WHQL/Kxv4_v6.1.1603_TA_RC7_WHQL/PrnDrv/PCL Driver/64bit/win81 and newer/prnkycl1.cat",
+      "trustedSigners": [ "Microsoft Windows Hardware Compatibility Publisher" ],
+      "supportedOs": [ "Windows 10 x64", "Windows 11 x64" ],
+      "minOsBuild": 10240,
+      "approved": true,
+      "approvedBy": "Initial manifest, verified 2026-11-03 (IT to countersign)",
+      "verifiedOn": "2026-11-03",
+      "notes": "Listed with the same URL on the TA P-4030DN, P-4531DN and P-5032DN pages and the UTAX pages. Size and SHA-256 independently re-verified from two downloads. Catalog prnkycl1.cat is WHQL (Microsoft Windows Hardware Compatibility Publisher), timestamped, valid for Windows 10.0. Covers all three models for x64 under [UTAX/TA.NTamd64]."
+    },
+    {
+      "id": "ta-kx-8.7.0917",
+      "displayName": "TA Triumph-Adler KX Universal Print PCL/PostScript Driver 8.7.0917",
+      "publisher": "TA Triumph-Adler / UTAX (Kyocera Document Solutions)",
+      "version": "8.7.0917",
+      "infDriverVer": "09/17/2026,8.7.0917.0",
+      "driverType": "Kyocera KX v3 printer driver (vendor GDI driver), Authenticode-signed by KYOCERA Document Solutions Inc. (not WHQL)",
+      "sourcePage": "https://www.triumph-adler.com/ta-en-de/hardware/office-printer/product/P-4030DN",
+      "downloadUrl": "https://www.triumph-adler.com/caas/v1/ta/media/102720/data/04e63668c3001927fbccf7c5c22a6cc3/Kx87_UPD_8.7.0917.zip",
+      "fileName": "Kx87_UPD_8.7.0917.zip",
+      "sizeBytes": 203308603,
+      "sha256": "862A5367A365F0FF61365BAF0D229A0F761E6F64EFE8013E8FF6DA8C2C109E48",
+      "environment": "Windows x64",
+      "architecture": "x64",
+      "infPath": "Kx87_UPD_8.7.0917/64bit/OEMSETUP.INF",
+      "catalogPath": "Kx87_UPD_8.7.0917/64bit/utax.cat",
+      "trustedSigners": [ "KYOCERA Document Solutions Inc." ],
+      "supportedOs": [ "Windows 10 x64", "Windows 11 x64" ],
+      "minOsBuild": 10240,
+      "approved": true,
+      "approvedBy": "Initial manifest, verified 2026-11-03 (IT to countersign)",
+      "verifiedOn": "2026-11-03",
+      "notes": "Alternative, not preferred by any model. Its x64 catalog is vendor-signed (thumbprint AA2098F3E70AC791261FF95930AE4C981B28C0D3), so Windows installs it silently only when that certificate is in the LocalMachine Trusted Publishers store (deploy by GPO); otherwise silent installation is refused (expected HRESULT 0x800F0242). To use it, deploy the certificate and set a model's preferredDriverName to 'P-xxxx KX' and driverPackageId to this id. Never use the package's arm64 INF on x64."
+    }
+  ]
+}

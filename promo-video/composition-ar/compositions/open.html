@@ -1,0 +1,225 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "AmwagUI", sans-serif; color: #fff; }
+    .open-ground { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%); }
+    .open-wave { position: absolute; left: -200px; bottom: -120px; width: 2400px; opacity: 0.07; }
+
+    /* Step caption column */
+    .rail { position: absolute; inset-inline-start: 120px; top: 352px; display: flex; gap: 8px; }
+    .rail i { display: block; width: 64px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); }
+    .cap { position: absolute; inset-inline-start: 120px; top: 300px; width: 540px; }
+    .cap-label { font-size: 22px; font-weight: 600; letter-spacing: 0.12em; color: #c9d5e6; text-transform: uppercase; }
+    #root[lang="ar"] .cap-label { letter-spacing: 0; font-size: 26px; }
+    .cap-title { margin-top: 70px; font-size: 58px; font-weight: 600; line-height: 1.14; }
+    .cap-help { margin-top: 26px; font-size: 30px; line-height: 1.4; color: #c9d5e6; }
+    .hl { color: #f5b642; }
+    .w { display: inline-block; white-space: pre; }
+    bdi { unicode-bidi: isolate; }
+
+    /* The window area: same place and size as the app window in the next scene */
+    .open-view { position: absolute; top: 106px; width: 1092px; height: 868px; inset-inline-end: 96px; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06); }
+    .open-cam { position: absolute; left: 0; top: 0; width: 840px; height: 668px; transform-origin: 0 0; }
+    .fx { position: absolute; inset: 0; background: #ffffff; color: #15191d; }
+    .fx-tb { position: absolute; top: 0; inset-inline: 0; height: 40px; background: #f3f3f3; }
+    .fx-tb-icon { position: absolute; inset-inline-start: 14px; top: 11px; width: 20px; height: 16px; }
+    .fx-tb-title { position: absolute; inset-inline-start: 44px; top: 11px; font-size: 12px; }
+    .fx-ctl { position: absolute; inset-inline-end: 0; top: 0; display: flex; }
+    .fx-ctl span { display: block; width: 46px; height: 40px; text-align: center; line-height: 40px; font-size: 13px; color: #15191d; }
+    .fx-addr { position: absolute; top: 40px; inset-inline: 0; height: 46px; background: #f9f9f9; border-bottom: 1px solid #e5e5e5; }
+    .fx-nav { position: absolute; inset-inline-start: 14px; top: 13px; font-size: 14px; color: #56616b; letter-spacing: 10px; }
+    .fx-path { position: absolute; inset-inline-start: 96px; inset-inline-end: 16px; top: 8px; height: 30px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; font-size: 12px; line-height: 28px; padding-inline-start: 12px; color: #15191d; }
+    .fx-head { position: absolute; top: 86px; inset-inline: 0; height: 30px; font-size: 11.5px; color: #56616b; border-bottom: 1px solid #ededed; }
+    .fx-head span, .fx-row span { position: absolute; top: 0; }
+    .fx-head span { line-height: 30px; }
+    .c-name { inset-inline-start: 56px; }
+    .c-type { inset-inline-start: 460px; }
+    .fx-row { position: absolute; inset-inline: 8px; height: 36px; border-radius: 4px; font-size: 13px; }
+    .fx-row span { line-height: 36px; }
+    .fx-row .c-type { color: #56616b; inset-inline-start: 452px; }
+    .fx-row .c-name { inset-inline-start: 48px; }
+    .fx-ico { position: absolute; inset-inline-start: 16px; top: 8px; width: 20px; height: 20px; }
+    .ico-folder { background: #f5c44e; border-radius: 2px 4px 3px 3px; height: 15px; top: 11px; }
+    .ico-file { background: #fff; border: 1.5px solid #9aa5af; border-radius: 2px; width: 16px; inset-inline-start: 18px; }
+    .fx-hover { position: absolute; inset: 0; border-radius: 4px; background: #e5f1fb; opacity: 0; }
+    .fx-sel { position: absolute; inset: 0; border-radius: 4px; background: #cce8ff; opacity: 0; }
+    .fx-status { position: absolute; bottom: 0; inset-inline: 0; height: 28px; font-size: 11.5px; color: #56616b; line-height: 28px; padding-inline-start: 16px; border-top: 1px solid #ededed; }
+
+    /* Startup splash (src/Amwag.PrinterSetup.App/UI/StartupSplash.cs) */
+    .sp { position: absolute; left: 140px; top: 150px; width: 560px; height: 340px; background: #0f2a4a; border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); color: #fff; overflow: hidden; }
+    .sp-logo { position: absolute; left: 155px; top: 26px; width: 250px; }
+    .sp-title { position: absolute; left: 0; right: 0; top: 188px; text-align: center; font-size: 20px; font-weight: 600; }
+    .sp-row { position: absolute; left: 140px; right: 140px; top: 232px; height: 20px; font-size: 13px; color: #c9d5e6; }
+    .sp-row span { position: absolute; top: 0; white-space: nowrap; }
+    .sp-txt { inset-inline-start: 0; }
+    .sp-pct { inset-inline-end: 0; }
+    .sp-bar { position: absolute; left: 140px; width: 280px; top: 262px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+    .sp-fill { position: absolute; inset-inline-start: 0; top: 0; height: 6px; width: 280px; border-radius: 3px; background: #ffffff; transform-origin: 0 50%; }
+    #root[dir="rtl"] .sp-fill { transform-origin: 100% 50%; }
+    .sp-foot { position: absolute; left: 0; right: 0; top: 298px; height: 42px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 12px; color: #c9d5e6; }
+    .sp-foot span { position: absolute; top: 13px; }
+    .cursor { position: absolute; left: 0; top: 0; width: 24px; height: 36px; }
+  </style>
+  <div id="root" class="scene-open" data-composition-id="open" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"enum","label":"Language","default":"en","options":[{"value":"en","label":"English"},{"value":"ar","label":"Arabic"}]}]'>
+    <div class="open-ground"></div>
+    <svg class="open-wave" id="open-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true">
+      <path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path>
+    </svg>
+
+    <div class="cap" id="open-cap">
+      <div class="cap-label" data-en="Step 1 of 6" data-ar="الخطوة 1 من 6"></div>
+      <div class="cap-title" id="open-cap-title" data-en="Open *AMWAG Printer Setup*" data-ar="افتح *AMWAG Printer Setup*"></div>
+      <div class="cap-help" id="open-cap-help" data-en="Double-click AMWAG Printer Setup.exe in the folder IT gave you." data-ar="انقر نقرًا مزدوجًا على AMWAG Printer Setup.exe في المجلد الذي سلّمه لك فريق تقنية المعلومات."></div>
+    </div>
+    <div class="rail" id="open-rail"><i id="open-r1"></i><i></i><i></i><i></i><i></i><i></i></div>
+
+    <div class="open-view" id="open-view" data-layout-allow-overflow>
+      <div class="open-cam" id="open-cam">
+        <div class="fx">
+          <div class="fx-tb">
+            <div class="fx-tb-icon" style="background:#f5c44e;border-radius:2px 5px 3px 3px;"></div>
+            <div class="fx-tb-title">AMWAG Printer Setup</div>
+            <div class="fx-ctl"><span>&#8212;</span><span>&#9744;</span><span>&#10005;</span></div>
+          </div>
+          <div class="fx-addr">
+            <div class="fx-nav">&#8592;&#8594;&#8593;</div>
+            <div class="fx-path" data-en="Desktop  ›  AMWAG Printer Setup" data-ar="سطح المكتب  ‹  AMWAG Printer Setup"></div>
+          </div>
+          <div class="fx-head">
+            <span class="c-name" data-en="Name" data-ar="الاسم"></span>
+            <span class="c-type" data-en="Type" data-ar="النوع"></span>
+          </div>
+          <div class="fx-row" style="top:122px"><div class="fx-ico ico-folder"></div><span class="c-name">docs</span><span class="c-type" data-en="File folder" data-ar="مجلد ملفات"></span></div>
+          <div class="fx-row" style="top:158px"><div class="fx-ico ico-folder"></div><span class="c-name">drivers</span><span class="c-type" data-en="File folder" data-ar="مجلد ملفات"></span></div>
+          <div class="fx-row" id="open-exe" style="top:194px">
+            <div class="fx-hover" id="open-exe-hover"></div>
+            <div class="fx-sel" id="open-exe-sel"></div>
+            <img class="fx-ico" src="assets/img/app-icon.png" alt="" style="border-radius:4px" />
+            <span class="c-name"><bdi>AMWAG Printer Setup.exe</bdi></span><span class="c-type" data-en="Application" data-ar="تطبيق"></span>
+          </div>
+          <div class="fx-row" style="top:230px"><div class="fx-ico ico-file"></div><span class="c-name"><bdi>amwag-printer-config.json</bdi></span><span class="c-type" data-en="JSON File" data-ar="ملف JSON"></span></div>
+          <div class="fx-row" style="top:266px"><div class="fx-ico ico-file"></div><span class="c-name"><bdi>README.md</bdi></span><span class="c-type" data-en="Markdown File" data-ar="ملف Markdown"></span></div>
+          <div class="fx-row" style="top:302px"><div class="fx-ico ico-file"></div><span class="c-name"><bdi>SHA256SUMS.txt</bdi></span><span class="c-type" data-en="Text Document" data-ar="مستند نصي"></span></div>
+          <div class="fx-status" data-en="6 items" data-ar="6 عناصر"></div>
+        </div>
+
+        <div class="sp" id="open-splash" dir="ltr">
+          <img class="sp-logo" src="assets/img/amwag-logo.svg" alt="AMWAG Travel" />
+          <div class="sp-title" data-en="Printer Setup" data-ar="إعداد الطابعة"></div>
+          <div class="sp-row" id="open-sp-row">
+            <span class="sp-txt" id="open-sp-t1" data-en="Loading settings…" data-ar="جارٍ تحميل الإعدادات…"></span>
+            <span class="sp-txt" id="open-sp-t2" style="opacity:0" data-en="Opening the window…" data-ar="جارٍ فتح النافذة…"></span>
+            <span class="sp-pct" id="open-sp-pct">0%</span>
+          </div>
+          <div class="sp-bar"><div class="sp-fill" id="open-sp-fill"></div></div>
+          <div class="sp-foot">
+            <span style="left:20px" data-en="Version 1.0.0" data-ar="الإصدار 1.0.0"></span>
+            <span style="right:20px" data-en="© 2026 AMWAG Travel · AMWAG IT Department" data-ar="© 2026 أمواج ترافيل · إدارة تكنولوجيا المعلومات"></span>
+          </div>
+        </div>
+
+        <svg class="cursor" id="open-cursor" viewBox="0 0 24 36" aria-hidden="true">
+          <path d="M1.5 1.5 L1.5 28 L8 21.8 L12.4 32.4 L17 30.4 L12.6 20 L21.5 20 Z" fill="#ffffff" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const AR = vars.lang === "ar";
+      const root = document.querySelector(".scene-open");
+      root.setAttribute("dir", AR ? "rtl" : "ltr");
+      root.setAttribute("lang", AR ? "ar" : "en");
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      root.querySelectorAll("[data-en]").forEach((el) => {
+        const text = AR ? el.dataset.ar : el.dataset.en;
+        if (text.includes("*")) el.innerHTML = esc(text).replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>');
+        else el.textContent = text;
+      });
+      // The splash mirrors in Arabic like the app does.
+      if (AR) document.getElementById("open-splash").setAttribute("dir", "rtl");
+      function words(el) {
+        // One span per word; in Arabic a run of Latin words (a product name) stays one left-to-right span.
+        const groups = [];
+        Array.from(el.childNodes).forEach((node) => {
+          const hl = node.nodeType === 1;
+          node.textContent.split(" ").filter(Boolean).forEach((t) => {
+            const latin = /[A-Za-z]/.test(t) && !/[؀-ۿ]/.test(t);
+            const last = groups[groups.length - 1];
+            if (AR && latin && last && last.latin && last.hl === hl) last.text += " " + t;
+            else groups.push({ text: t, latin: latin, hl: hl });
+          });
+        });
+        el.textContent = "";
+        return groups.map((g, i) => {
+          const s = document.createElement("span");
+          s.className = "w" + (g.hl ? " hl" : "");
+          if (AR && g.latin) s.setAttribute("dir", "ltr");
+          s.textContent = g.text;
+          el.appendChild(s);
+          // The space sits between pieces, so it lands on the correct side in both directions.
+          if (i < groups.length - 1) el.appendChild(document.createTextNode(" "));
+          return s;
+        });
+      }
+      const title = words(document.getElementById("open-cap-title"));
+
+      // Window-space point; the window mirrors in Arabic, the mouse pointer does not.
+      const P = (x, y) => ({ x: AR ? 840 - x : x, y: y });
+      const start = P(560, 560);
+      const exe = P(150, 214);
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#open-wave", { x: -64 }, { x: -118, duration: 5.4, ease: "none" }, 0);
+      tl.set("#open-cam", { scale: 1.3, x: 0, y: 0 }, 0);
+
+      // Window and caption arrive.
+      tl.fromTo("#open-view", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.05);
+      tl.fromTo("#open-cap .cap-label", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.2);
+      tl.fromTo("#open-rail", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 0.25);
+      tl.fromTo("#open-r1", { backgroundColor: "rgba(255,255,255,0.18)" }, { backgroundColor: "#ffffff", duration: 0.3, ease: "power2.out" }, 0.35);
+      tl.fromTo(title, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, ease: "power2.out", stagger: 0.067 }, 0.35);
+      tl.fromTo("#open-cap-help", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.75);
+
+      // The pointer glides to the exe and double-clicks it.
+      tl.fromTo("#open-cursor", { opacity: 0, x: start.x, y: start.y }, { opacity: 1, duration: 0.15 }, 0.7);
+      tl.to("#open-cursor", { x: exe.x, y: exe.y, duration: 0.85, ease: "power2.inOut" }, 0.75);
+      // Punch in on the exe row while it is double-clicked, then back out for the splash.
+      const s = 1.3 * 1.7;
+      const fx = Math.min(0, Math.max(1092 - 840 * s, 546 - (AR ? 840 - 220 : 220) * s));
+      const fy = Math.min(0, Math.max(868 - 668 * s, 434 - 212 * s));
+      tl.to("#open-cam", { scale: s, x: fx, y: fy, duration: 0.7, ease: "power2.inOut" }, 0.95);
+      tl.to("#open-cam", { scale: 1.3, x: 0, y: 0, duration: 0.6, ease: "power2.inOut" }, 2.05);
+      tl.to("#open-exe-hover", { opacity: 1, duration: 0.1 }, 1.45);
+      tl.to("#open-cursor", { scale: 0.88, duration: 0.05, ease: "power1.out", transformOrigin: "0 0" }, 1.75);
+      tl.to("#open-cursor", { scale: 1, duration: 0.07, ease: "power1.out" }, 1.8);
+      tl.to("#open-exe-sel", { opacity: 1, duration: 0.05 }, 1.75);
+      tl.to("#open-cursor", { scale: 0.88, duration: 0.05, ease: "power1.out" }, 1.9);
+      tl.to("#open-cursor", { scale: 1, duration: 0.07, ease: "power1.out" }, 1.95);
+      tl.to("#open-cursor", { opacity: 0, duration: 0.15 }, 2.35);
+
+      // The splash loads (StartupSplash: "Loading settings…" then "Opening the window…").
+      tl.fromTo("#open-splash", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.4, ease: "expo.out" }, 2.15);
+      tl.fromTo("#open-sp-fill", { scaleX: 0 }, { scaleX: 0.6, duration: 1.1, ease: "power1.inOut" }, 2.35);
+      tl.fromTo("#open-sp-pct", { innerText: 0 }, { innerText: 60, duration: 1.1, ease: "power1.inOut", snap: { innerText: 1 },
+        modifiers: { innerText: (v) => Math.round(v) + "%" } }, 2.35);
+      tl.set("#open-sp-t1", { opacity: 0 }, 3.55);
+      tl.set("#open-sp-t2", { opacity: 1 }, 3.55);
+      tl.to("#open-sp-fill", { scaleX: 1, duration: 0.8, ease: "power1.inOut" }, 3.55);
+      tl.fromTo("#open-sp-pct", { innerText: 60 }, { innerText: 100, duration: 0.8, ease: "power1.inOut", snap: { innerText: 1 },
+        modifiers: { innerText: (v) => Math.round(v) + "%" }, immediateRender: false }, 3.55);
+
+      // Caption leaves, then the splash zooms through into the app window.
+      tl.to(["#open-cap", "#open-rail"], { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power2.in" }, 4.75);
+      tl.to("#open-splash", { scale: 1.22, opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power3.in", transformOrigin: "50% 50%" }, 4.85);
+      tl.to(".scene-open .fx", { opacity: 0, duration: 0.3, ease: "power2.in" }, 4.9);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["open"] = tl;
+    })();
+  </script>
+</template>

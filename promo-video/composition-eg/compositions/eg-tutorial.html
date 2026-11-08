@@ -1,0 +1,722 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "AmwagUI", sans-serif; color: #fff; direction: rtl; }
+    .tu-ground { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%); }
+    .tu-wave { position: absolute; left: -200px; bottom: -120px; width: 2400px; opacity: 0.07; }
+    bdi { unicode-bidi: isolate; }
+
+    /* ---------- Step captions (from narration/scenes.json) ---------- */
+    .rail { position: absolute; right: 120px; top: 300px; display: flex; gap: 8px; opacity: 0; }
+    .rail i { display: block; width: 64px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); }
+    .cap { position: absolute; right: 120px; top: 246px; width: 560px; opacity: 0; }
+    .cap-label { font-size: 28px; font-weight: 600; color: #c9d5e6; }
+    .cap-title { margin-top: 62px; font-size: 54px; font-weight: 600; line-height: 1.22; }
+    .cap-help { margin-top: 22px; font-size: 30px; line-height: 1.45; color: #c9d5e6; }
+    .cap.top { top: 96px; }
+    .cap.top .cap-title { margin-top: 12px; font-size: 44px; }
+    .hl { color: #f5b642; }
+
+    /* ---------- Printed test ticket ---------- */
+    .tk-slot { position: absolute; right: 108px; top: 262px; width: 340px; height: 22px; border-radius: 11px; background: #071629; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35); opacity: 0; }
+    .tk-clip { position: absolute; right: 128px; top: 273px; width: 300px; height: 640px; overflow: hidden; }
+    .tk { position: absolute; left: 0; top: 0; width: 300px; height: 614px; background: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4); opacity: 0; direction: ltr; }
+    .tk svg { position: absolute; inset: 0; width: 300px; height: 614px; }
+    .tk-labels { position: absolute; right: 456px; top: 400px; width: 236px; }
+    .tk-l { position: relative; height: 96px; font-size: 25px; font-weight: 600; line-height: 1.25; padding-right: 42px; opacity: 0; }
+    .tk-l svg { position: absolute; right: 0; top: 2px; width: 30px; height: 30px; }
+
+    /* ---------- Printer label (model confirmation) ---------- */
+    .plabel { position: absolute; right: 120px; top: 560px; width: 420px; height: 210px; border-radius: 10px; background: #f4f4f1; color: #111; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); direction: ltr; opacity: 0; font-family: "AmwagUI", sans-serif; }
+    .plabel .brand { position: absolute; left: 24px; top: 18px; font-size: 20px; font-weight: 700; letter-spacing: 0.02em; }
+    .plabel .model { position: absolute; left: 24px; top: 50px; font-size: 52px; font-weight: 700; }
+    .plabel .sub { position: absolute; left: 24px; top: 120px; font-size: 18px; color: #333; }
+    .plabel .bars { position: absolute; left: 24px; right: 24px; bottom: 18px; height: 34px; background: repeating-linear-gradient(90deg, #111 0 3px, transparent 3px 6px, #111 6px 7px, transparent 7px 11px, #111 11px 15px, transparent 15px 17px); }
+    .plabel .ring { position: absolute; left: 14px; top: 44px; width: 300px; height: 74px; border: 4px solid #f5b642; border-radius: 12px; opacity: 0; }
+
+    /* ---------- The AMWAG Printer Setup window (840 x 668 logical px at 1.2x) ---------- */
+    .view { position: absolute; top: 62px; left: 96px; width: 1008px; height: 802px; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06); background: #fff; }
+    .cam { position: absolute; left: 0; top: 0; width: 840px; height: 668px; transform-origin: 0 0; direction: rtl; }
+    .win { position: absolute; inset: 0; background: #fff; color: #15191d; font-size: 13.33px; }
+    .tb { position: absolute; top: 0; left: 0; right: 0; height: 32px; background: #fff; border-bottom: 1px solid #e8ecef; }
+    .tb img { position: absolute; right: 10px; top: 8px; width: 16px; height: 16px; border-radius: 3px; }
+    .tb-title { position: absolute; right: 34px; top: 8px; font-size: 12px; direction: ltr; }
+    .tb-ctl { position: absolute; left: 0; top: 0; display: flex; direction: ltr; }
+    .tb-ctl span { display: block; width: 46px; height: 32px; text-align: center; line-height: 32px; font-size: 12px; }
+    .hd { position: absolute; top: 32px; left: 0; right: 0; height: 85px; background: #0f2a4a; color: #fff; }
+    .hd img { position: absolute; right: 24px; top: 27px; width: 104px; }
+    .hd-title { position: absolute; right: 146px; top: 14px; font-size: 20px; font-weight: 600; white-space: nowrap; direction: ltr; }
+    .hd-sub { position: absolute; right: 146px; top: 49px; font-size: 13px; color: #c9d5e6; white-space: nowrap; }
+    .hd-lang { position: absolute; left: 24px; top: 22px; width: 88px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 4px; text-align: center; line-height: 38px; font-size: 13px; }
+    .bd { position: absolute; top: 117px; left: 0; right: 0; height: 515px; }
+    .steps { position: absolute; right: 0; top: 0; width: 248px; height: 515px; background: #f2f4f5; }
+    .content { position: absolute; left: 0; top: 0; width: 592px; height: 515px; background: #fff; }
+    .ft { position: absolute; top: 632px; left: 0; right: 0; height: 36px; background: #f2f4f5; border-top: 1px solid #dce1e5; font-size: 12px; color: #56616b; }
+    .ft span { position: absolute; top: 9px; white-space: nowrap; }
+
+    .st { position: absolute; right: 0; width: 248px; height: 56px; }
+    .st-g { position: absolute; right: 20px; top: 12px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #7b8792; background: #fff; }
+    .st-g svg { position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; opacity: 0; }
+    .st-g[data-state="run"] { border: 3px solid #dce1e5; border-top-color: #0f2a4a; }
+    .st-g[data-state="done"] { border-color: #2e7d32; background: #2e7d32; }
+    .st-g[data-state="done"] svg.ok { opacity: 1; }
+    .st-g[data-state="warn"] { border-color: #e08a00; background: #e08a00; }
+    .st-g[data-state="warn"] svg.bang { opacity: 1; }
+    .st-g[data-state="fail"] { border-color: #c62828; background: #c62828; }
+    .st-g[data-state="fail"] svg.x { opacity: 1; }
+    .st-g[data-state="skip"] { border-color: #7b8792; background: #7b8792; }
+    .st-g[data-state="skip"] svg.dash { opacity: 1; }
+    .st-t { position: absolute; right: 57px; top: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-s { position: absolute; right: 57px; top: 27px; font-size: 11.67px; white-space: nowrap; max-width: 182px; overflow: hidden; text-overflow: ellipsis; color: #56616b; }
+    .st-s[data-state="run"] { color: #15191d; }
+    .st-s[data-state="done"] { color: #2e7d32; }
+    .st-s[data-state="warn"] { color: #9a5b00; }
+    .st-s[data-state="fail"] { color: #c62828; }
+    .st-line { position: absolute; right: 30px; width: 2px; height: 32px; background: #dce1e5; }
+    .st-line i { position: absolute; inset: 0; background: #0f2a4a; opacity: 0; }
+
+    .v { position: absolute; inset: 0; opacity: 0; }
+    .vin { position: absolute; right: 35px; top: 0; width: 528px; height: 515px; }
+    .vin > * { position: absolute; right: 0; }
+    .v-h { top: 26px; font-size: 19px; font-weight: 600; white-space: nowrap; }
+    .v-p { top: 62px; width: 528px; color: #56616b; line-height: 1.45; }
+    .v-strong { color: #15191d; font-weight: 600; }
+    .ring { position: absolute; width: 34px; height: 34px; border-radius: 50%; border: 4px solid #e3eaf2; border-top-color: #0f2a4a; }
+    .run-row { width: 528px; height: 34px; }
+    .run-row .ring { right: 0; top: 0; }
+    .run-t { position: absolute; right: 50px; top: 7px; font-weight: 600; white-space: nowrap; opacity: 0; }
+    .detail { width: 528px; height: 18px; font-size: 12px; color: #56616b; }
+    .detail span { position: absolute; right: 0; top: 0; white-space: nowrap; opacity: 0; }
+    .box { width: 528px; border-radius: 6px; border-right: 4px solid #0f2a4a; background: #e3eaf2; }
+    .box.warn { background: #fff4df; border-right-color: #e08a00; }
+    .box.err { background: #fdecea; border-right-color: #c62828; }
+    .box .ic { position: absolute; right: 14px; top: 13px; width: 20px; height: 20px; }
+    .box b { position: absolute; right: 48px; top: 11px; font-weight: 600; white-space: nowrap; }
+    .box div { position: absolute; right: 48px; width: 455px; line-height: 1.45; }
+    .card { width: 528px; border: 1px solid #dce1e5; border-radius: 8px; background: #fff; }
+    .card-t { position: absolute; right: 16px; top: 14px; font-size: 12px; font-weight: 600; color: #56616b; }
+    .card-h { position: absolute; right: 16px; top: 12px; font-size: 13.33px; font-weight: 600; color: #15191d; direction: ltr; }
+    .row { position: absolute; right: 0; width: 526px; height: 28px; font-size: 12.5px; }
+    .row b { position: absolute; right: 16px; top: 5px; font-weight: 400; color: #56616b; white-space: nowrap; }
+    .row span { position: absolute; right: 112px; top: 5px; white-space: nowrap; }
+    .row-hl { position: absolute; left: 6px; right: 6px; top: 0; height: 28px; border-radius: 4px; background: #fff4df; opacity: 0; }
+    .btn { height: 40px; border-radius: 4px; text-align: center; line-height: 38px; font-size: 13.33px; white-space: nowrap; }
+    .btn-a { background: #f5b642; border: 1px solid #f5b642; color: #15191d; font-weight: 600; }
+    .btn-o { background: #fff; border: 1px solid #7b8792; color: #15191d; }
+    .btn-d { background: #e8ecef; border: 1px solid #e8ecef; color: #b4bec8; font-weight: 600; }
+    .btn i { position: absolute; inset: -1px; border-radius: 4px; background: #d69422; opacity: 0; }
+    .btn label { position: relative; }
+    .lnk { font-size: 13.33px; white-space: nowrap; }
+    .res-ico { width: 36px; height: 36px; border-radius: 50%; }
+    .res-ico svg { position: absolute; left: 8px; top: 8px; width: 20px; height: 20px; }
+    .res-t { right: 52px !important; top: 20px; font-size: 19px; font-weight: 600; white-space: nowrap; }
+    .res-p { right: 52px !important; top: 48px; width: 476px; color: #56616b; line-height: 1.45; }
+    .chk { width: 528px; height: 24px; }
+    .chk i { position: absolute; right: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #56616b; background: #fff; }
+    .chk em { position: absolute; right: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; background: #0f2a4a; opacity: 0; }
+    .chk em svg { position: absolute; left: 4px; top: 4px; width: 10px; height: 10px; }
+    .chk span { position: absolute; right: 28px; top: 0; white-space: nowrap; }
+    .gi { width: 528px; }
+    .gi .ic { position: absolute; right: 0; top: 2px; width: 18px; height: 18px; }
+    .gi div { position: absolute; right: 28px; width: 500px; line-height: 1.45; }
+    .tbl { top: 182px; width: 528px; height: 222px; border: 1px solid #dce1e5; border-radius: 8px; opacity: 0; }
+    .tbl-h { position: absolute; right: 0; top: 8px; width: 526px; height: 30px; font-size: 12px; color: #56616b; }
+    .tbl-h span, .tr span { position: absolute; top: 0; }
+    .tr { position: absolute; right: 0; width: 526px; height: 44px; opacity: 0; }
+    .c1 { right: 40px; }
+    .c2 { right: 222px; width: 150px; line-height: 1.25; }
+    .c3 { right: 382px; width: 140px; line-height: 1.25; }
+    .tr .ok { position: absolute; right: 12px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: #2e7d32; }
+    .tr .ok svg { position: absolute; left: 4px; top: 4px; width: 10px; height: 10px; }
+    .tr .c1 { font-weight: 600; }
+    .tr small { position: absolute; right: 40px; top: 20px; font-size: 11.5px; color: #2e7d32; }
+    .pcard { width: 528px; height: 150px; border: 1px solid #dce1e5; border-radius: 8px; background: #fff; }
+    .pcard .sel { position: absolute; inset: -1px; border: 2px solid #0f2a4a; border-radius: 8px; background: rgba(227, 234, 242, 0.55); opacity: 0; }
+    .field { width: 320px; height: 30px; border: 1px solid #7b8792; border-radius: 3px; background: #fff; direction: ltr; text-align: left; }
+    .field .txt { position: absolute; left: 8px; top: 6px; font-size: 13.33px; white-space: pre; }
+    .field .caret { position: absolute; top: 6px; width: 1px; height: 18px; background: #15191d; opacity: 0; }
+
+    /* Windows permission prompts (illustrative) */
+    .shade { position: absolute; inset: 0; background: rgba(8, 18, 32, 0.55); opacity: 0; }
+    .dlg { position: absolute; left: 190px; top: 200px; width: 460px; height: 254px; background: #ffffff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); color: #15191d; overflow: hidden; opacity: 0; }
+    .dlg-h { position: absolute; right: 24px; top: 16px; font-size: 12px; color: #56616b; }
+    .dlg-q { position: absolute; right: 24px; top: 42px; width: 412px; font-size: 18px; font-weight: 600; line-height: 1.35; }
+    .dlg-app { position: absolute; right: 24px; top: 116px; height: 34px; }
+    .dlg-app img { position: absolute; right: 0; top: 0; width: 32px; height: 32px; border-radius: 6px; }
+    .dlg-app span { position: absolute; right: 44px; top: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; direction: ltr; }
+    .dlg-f { position: absolute; left: 0; right: 0; bottom: 0; height: 66px; background: #f3f3f3; border-top: 1px solid #e5e5e5; }
+    .dlg-b { position: absolute; top: 16px; width: 202px; height: 34px; border-radius: 4px; text-align: center; line-height: 32px; font-size: 13.33px; }
+    .dlg-yes { right: 24px; background: #0067c0; border: 1px solid #0067c0; color: #fff; }
+    .dlg-no { right: 234px; background: #fbfbfb; border: 1px solid #d1d1d1; }
+    .dlg-yes i { position: absolute; inset: -1px; border-radius: 4px; background: #003e73; opacity: 0; }
+    .dlg-yes label { position: relative; }
+    .dlg.admin { top: 150px; height: 340px; }
+    .dlg-in { position: absolute; right: 24px; width: 412px; height: 32px; border: 1px solid #c4c4c4; border-bottom: 2px solid #0067c0; border-radius: 4px; background: #fff; color: #8a8a8a; font-size: 13.33px; line-height: 30px; padding-right: 10px; }
+    .cursor { position: absolute; left: 0; top: 0; width: 24px; height: 36px; opacity: 0; }
+    .spot { --sx: 50%; --sy: 50%; --srx: 16%; --sry: 8%; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: rgba(6, 16, 30, 0.5);
+      -webkit-mask-image: radial-gradient(ellipse var(--srx) var(--sry) at var(--sx) var(--sy), transparent 0%, transparent 55%, black 92%);
+      mask-image: radial-gradient(ellipse var(--srx) var(--sry) at var(--sx) var(--sy), transparent 0%, transparent 55%, black 92%); }
+  </style>
+
+  <div id="root" class="scene-tu" data-composition-id="eg-tutorial" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"string","label":"Language","default":"ar"},{"id":"cues","type":"string","label":"Timing (generated)","default":"{}"}]'>
+    <div class="tu-ground" data-layout-allow-occlusion></div>
+    <svg class="tu-wave" id="tu-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true"><path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path></svg>
+
+    <div class="rail" id="tu-rail"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="tu-caps"></div>
+
+    <!-- Printed test ticket (layout of TestTicket/TestTicketLayout.cs, values from config/amwag-printer-config.json) -->
+    <div class="tk-slot" id="tu-slot"></div>
+    <div class="tk-clip" id="tu-tkclip" data-layout-allow-overflow>
+      <div class="tk" id="tu-tk">
+        <svg viewBox="0 0 83.06 170.18" aria-label="Printer test ticket">
+          <rect x="0" y="0" width="83.06" height="170.18" fill="#ffffff"></rect>
+          <rect x="4.2" y="4.2" width="74.66" height="161.78" fill="none" stroke="#9aa5af" stroke-width="0.25" stroke-dasharray="0.7 0.7"></rect>
+          <g id="tu-tk-rulers" stroke="#30363d" stroke-width="0.18"></g>
+          <g id="tu-hl-top" opacity="0"><rect x="34" y="16" width="44" height="14" rx="1.5" fill="#f5b642" opacity="0.35"></rect></g>
+          <path d="M41.53 17 L45 22 L42.6 22 L42.6 29 L40.46 29 L40.46 22 L38.06 22 Z" fill="#111"></path>
+          <text x="47" y="24.6" font-size="3.4" font-weight="700" fill="#111" font-family="AmwagUI, sans-serif">TOP / FEED</text>
+          <text x="46" y="38.5" font-size="5.4" font-weight="700" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif">AMWAG Travel</text>
+          <text x="46" y="44.2" font-size="3.4" font-weight="700" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif">PRINTER TEST TICKET</text>
+          <text x="46" y="50.2" font-size="3.6" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif" direction="rtl">تذكرة اختبار الطابعة</text>
+          <g font-size="2.7" fill="#111" font-family="AmwagUI, sans-serif">
+            <text x="17" y="57.5">Model: TA P-4030DN</text><text x="17" y="61.6">Printer: AMWAG Ticket Printer</text>
+            <text x="17" y="65.7">Paper: AMWAG Ticket</text><text x="17" y="69.8">83.06 x 170.18 mm (3.27 x 6.70 in)</text>
+            <text x="17" y="75.2" font-weight="700">Portrait, 100% scale:</text><text x="17" y="79.3" font-weight="700">the bars must measure exactly 50 mm</text>
+          </g>
+          <g stroke="#111" stroke-width="0.25" fill="#111">
+            <line x1="8" y1="86" x2="75" y2="86"></line><path d="M6.5 86 L9.5 84.6 L9.5 87.4 Z"></path><path d="M76.5 86 L73.5 84.6 L73.5 87.4 Z"></path>
+            <line x1="41.53" y1="81.5" x2="41.53" y2="100"></line><line x1="41.53" y1="126" x2="41.53" y2="160"></line><path d="M41.53 162 L40.13 159 L42.93 159 Z"></path>
+          </g>
+          <g id="tu-hl-bars" opacity="0" stroke="#f5b642" stroke-width="3" stroke-linecap="round" fill="none"><line x1="16.5" y1="95" x2="66.5" y2="95"></line><line x1="70" y1="102" x2="70" y2="152"></line></g>
+          <g stroke="#111" fill="none">
+            <line x1="16.5" y1="95" x2="66.5" y2="95" stroke-width="1.1"></line><line x1="16.5" y1="93.3" x2="16.5" y2="96.7" stroke-width="0.35"></line><line x1="66.5" y1="93.3" x2="66.5" y2="96.7" stroke-width="0.35"></line>
+            <line x1="70" y1="102" x2="70" y2="152" stroke-width="1.1"></line><line x1="68.3" y1="102" x2="71.7" y2="102" stroke-width="0.35"></line><line x1="68.3" y1="152" x2="71.7" y2="152" stroke-width="0.35"></line>
+          </g>
+          <g font-size="2.7" font-weight="700" fill="#111" font-family="AmwagUI, sans-serif"><text x="45" y="92" text-anchor="middle">50 mm</text><text x="66" y="128" text-anchor="end">50 mm</text></g>
+          <g font-size="2.5" fill="#111" font-family="AmwagUI, sans-serif">
+            <text x="17" y="104" font-weight="700">Check:</text><text x="17" y="108">1  All four corner marks printed</text><text x="17" y="111.8">2  Both bars measure 50 mm</text>
+            <text x="17" y="115.6">3  Text upright, nothing cut off</text><text x="17" y="119.4">4  Fed from the multipurpose tray</text>
+          </g>
+          <g id="tu-hl-corners" opacity="0" stroke="#f5b642" stroke-width="2.4" fill="none" stroke-linecap="round">
+            <path d="M6 13 L6 6 L13 6"></path><path d="M70.06 6 L77.06 6 L77.06 13"></path><path d="M6 157.18 L6 164.18 L13 164.18"></path><path d="M70.06 164.18 L77.06 164.18 L77.06 157.18"></path>
+          </g>
+          <g stroke="#111" stroke-width="0.7" fill="none">
+            <path d="M6 13 L6 6 L13 6"></path><path d="M70.06 6 L77.06 6 L77.06 13"></path><path d="M6 157.18 L6 164.18 L13 164.18"></path><path d="M70.06 164.18 L77.06 164.18 L77.06 157.18"></path>
+          </g>
+          <rect id="tu-hl-edge" x="0.8" y="0.8" width="81.46" height="168.58" fill="none" stroke="#f5b642" stroke-width="1.6" opacity="0"></rect>
+        </svg>
+      </div>
+    </div>
+    <div class="tk-labels" id="tu-tklabels">
+      <div class="tk-l" id="tu-tl1"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>علامات الزوايا الأربعة</div>
+      <div class="tk-l" id="tu-tl2"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>الشريطين 50 مم</div>
+      <div class="tk-l" id="tu-tl3"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>الكلام سليم ومش مقطوع</div>
+      <div class="tk-l" id="tu-tl4"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>من الدرج متعدد الأغراض</div>
+    </div>
+
+    <!-- Model label on the printer (model confirmation) -->
+    <div class="plabel" id="tu-plabel"><div class="brand">TA Triumph-Adler</div><div class="model">P-4531DN</div><div class="sub">Laser printer · Model P-4531DN</div><div class="bars"></div><div class="ring" id="tu-plabel-ring"></div></div>
+
+    <!-- The app window -->
+    <div class="view" id="tu-view" data-layout-allow-overflow>
+      <div class="cam" id="tu-cam">
+        <!-- Replica of the app window: its colours are the app's own WCAG AA theme (UI/Theme.cs) and parts of it are
+             dimmed on purpose by the click spotlight, so it is left out of the layout and contrast audit. -->
+        <div class="win" data-layout-ignore>
+          <div class="tb" data-layout-ignore><img src="assets/img/app-icon.png" alt="" /><div class="tb-title">AMWAG Printer Setup</div><div class="tb-ctl"><span>&#10005;</span><span>&#9744;</span><span>&#8212;</span></div></div>
+          <div class="hd" data-layout-ignore><img src="assets/img/amwag-mark.svg" alt="AMWAG" /><div class="hd-title">AMWAG Printer Setup</div><div class="hd-sub">إعداد طابعة التذاكر في فرعك</div><div class="hd-lang">English</div></div>
+          <div class="bd">
+            <div class="steps" id="tu-steps" data-layout-allow-overflow data-layout-ignore></div>
+            <div class="content">
+
+              <div class="v" id="v-progress"><div class="vin">
+                <div class="v-h">جارٍ إعداد طابعة التذاكر</div>
+                <div class="v-p">يستغرق ذلك عادةً أقل من دقيقة، ولن يُطلب منك أي شيء إلا عند الضرورة.</div>
+                <div class="run-row" style="top:118px"><div class="ring" id="p-ring"></div>
+                  <div class="run-t" id="p-t0">جارٍ البدء…</div><div class="run-t" id="p-t1">جارٍ البحث عن الطابعة…</div><div class="run-t" id="p-t2">جارٍ فحص برنامج تشغيل الطابعة…</div>
+                  <div class="run-t" id="p-t3">جارٍ تثبيت برنامج تشغيل الطابعة…</div><div class="run-t" id="p-t4">جارٍ ضبط حجم ورق التذكرة…</div>
+                  <div class="run-t" id="p-t5">جارٍ التحقق من حفظ الإعدادات…</div><div class="run-t" id="p-t6">جارٍ الإنهاء…</div></div>
+                <div class="detail" style="top:166px"><span id="p-d1">جارٍ التحقق من سلامة الملفات والتوقيع الرقمي…</span><span id="p-d2">جارٍ التثبيت…</span><span id="p-d3">جارٍ تطبيق الإعدادات…</span></div>
+                <div class="box" id="p-notice" style="top:200px; height:64px; opacity:0">
+                  <svg class="ic" viewBox="0 0 20 22"><path d="M10 1 L18.5 4.2 L18.5 10.5 C18.5 15.5 14.8 19.3 10 21 C5.2 19.3 1.5 15.5 1.5 10.5 L1.5 4.2 Z" fill="#2f74c0"></path><path d="M10 1 L10 21 C14.8 19.3 18.5 15.5 18.5 10.5 L18.5 4.2 Z" fill="#f5b642"></path></svg>
+                  <div style="top:11px">سيطلب Windows الآن إذنًا لتثبيت برنامج تشغيل الطابعة وإنشاء حجم ورق التذكرة. يُرجى اختيار «نعم».</div>
+                </div>
+                <div class="card" id="p-card" style="top:200px; height:186px; opacity:0">
+                  <div class="card-t">الطابعة</div>
+                  <div class="row" style="top:42px" id="p-r1"><b>طراز الطابعة</b><span><bdi>TA P-4030DN</bdi></span></div>
+                  <div class="row" style="top:70px" id="p-r2"><b>الاتصال</b><span>كابل USB، المنفذ USB001</span></div>
+                  <div class="row" style="top:98px" id="p-r3"><b>برنامج التشغيل</b><span><bdi>P-4030DN v4 KX (PCL6)</bdi></span></div>
+                  <div class="row" style="top:126px" id="p-r4"><b>اسم الطابعة</b><span><bdi>AMWAG Ticket Printer</bdi></span></div>
+                  <div class="row" style="top:154px" id="p-r5"><div class="row-hl" id="p-r5-hl"></div><b>حجم ورق التذكرة</b><span><bdi>AMWAG Ticket 83.06 x 170.18 mm (3.27 x 6.70 in)</bdi></span></div>
+                </div>
+              </div></div>
+
+              <div class="v" id="v-result"><div class="vin">
+                <div class="res-ico" id="r-ico" style="top:22px; background:#2e7d32"><svg viewBox="0 0 20 20"><path d="M4 10.5 L8.2 14.5 L16 6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                <div class="res-t" style="color:#2e7d32">جاهزة لطباعة التذاكر</div>
+                <div class="res-p">تم إعداد طابعة التذاكر والتحقق من جميع الإعدادات.</div>
+                <div class="card" style="top:90px; height:214px">
+                  <div class="card-t">الملخص</div>
+                  <div class="row" style="top:40px"><b>طراز الطابعة</b><span><bdi>TA P-4030DN</bdi></span></div>
+                  <div class="row" style="top:68px"><b>اسم الطابعة</b><span><bdi>AMWAG Ticket Printer</bdi></span></div>
+                  <div class="row" style="top:96px"><b>برنامج التشغيل</b><span><bdi>P-4030DN v4 KX (PCL6)</bdi></span></div>
+                  <div class="row" style="top:124px"><b>الاتصال</b><span><bdi>USB (USB001)</bdi></span></div>
+                  <div class="row" style="top:152px"><b>حجم ورق التذكرة</b><span><bdi>AMWAG Ticket 83.06 x 170.18 mm (3.27 x 6.70 in)</bdi></span></div>
+                  <div class="row" style="top:180px"><b>مصدر الورق</b><span>الدرج متعدد الأغراض</span></div>
+                </div>
+                <div class="lnk" style="top:318px; right:14px">عرض التفاصيل</div>
+                <div class="btn btn-a" id="r-ptt" style="top:380px; width:150px"><i></i><label>طباعة تذكرة اختبار</label></div>
+                <div class="btn btn-o" style="top:380px; width:96px; right:160px">إصلاح</div>
+                <div class="btn btn-o" style="top:380px; width:96px; right:266px">إغلاق</div>
+                <div class="lnk" id="r-soft" style="top:440px; right:10px">فحص برنامج التذاكر</div>
+                <div class="lnk" style="top:440px; right:174px">حفظ التقرير…</div>
+                <div class="lnk" style="top:440px; right:280px">نسخ التقرير</div>
+                <div class="lnk" style="top:440px; right:380px; color:#b4bec8">فتح مجلد السجلات</div>
+              </div></div>
+
+              <div class="v" id="v-test"><div class="vin">
+                <div class="v-h">طباعة تذكرة اختبار</div>
+                <div class="v-p v-strong">ضع ورق التذاكر في الدرج متعدد الأغراض، ثم انقر «طباعة».</div>
+                <div class="v-p" style="top:90px">تحتوي تذكرة الاختبار على علامات زوايا ومساطر وشريطين بطول 50 مم، لتتحقق من حجمها وموضعها.</div>
+                <div class="run-row" id="t-row" style="top:160px; opacity:0"><div class="ring" id="t-ring"></div><div class="run-t" id="t-t1">جارٍ إرسال تذكرة الاختبار إلى الطابعة…</div><div class="run-t" id="t-t2">جارٍ الطباعة…</div></div>
+                <div class="btn btn-a" id="t-print" style="top:380px; width:96px"><i></i><label>طباعة</label></div>
+                <div class="btn btn-o" style="top:380px; width:96px; right:106px">رجوع</div>
+              </div></div>
+
+              <div class="v" id="v-sent"><div class="vin">
+                <div class="v-h">أرسل Windows تذكرة الاختبار إلى الطابعة</div>
+                <div class="v-p v-strong">يُرجى فحص التذكرة المطبوعة:</div>
+                <div class="chk" style="top:100px"><i></i><em id="s-c1"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span>علامات الزوايا الأربع ظاهرة</span></div>
+                <div class="chk" style="top:132px"><i></i><em id="s-c2"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span>طول كل من الشريطين 50 مم بالضبط</span></div>
+                <div class="chk" style="top:164px"><i></i><em id="s-c3"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span>النص في الاتجاه الصحيح ولا يوجد شيء مقطوع</span></div>
+                <div class="chk" style="top:196px"><i></i><em id="s-c4"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span>سُحبت التذكرة من الدرج متعدد الأغراض</span></div>
+                <div class="btn btn-a" id="s-ok" style="top:380px; width:150px"><i></i><label>طُبعت بشكل صحيح</label></div>
+                <div class="btn btn-o" id="s-bad" style="top:380px; width:160px; right:160px"><i style="background:#c8ced3"></i><label>توجد مشكلة</label></div>
+                <div class="lnk" style="top:391px; right:344px">رجوع</div>
+              </div></div>
+
+              <div class="v" id="v-soft"><div class="vin">
+                <div class="v-h">فحص برنامج التذاكر</div>
+                <div class="v-p v-strong">اطبع الآن تذكرة واحدة من برنامج التذاكر.</div>
+                <div class="run-row" id="w-row" style="top:104px"><div class="ring" id="w-ring"></div>
+                  <div class="run-t" id="w-t1">في انتظار مهمة طباعة… الوقت المتبقي 1:59</div><div class="run-t" id="w-t2">في انتظار مهمة طباعة… الوقت المتبقي 1:58</div>
+                  <div class="run-t" id="w-t3">في انتظار مهمة طباعة… الوقت المتبقي 1:57</div><div class="run-t" id="w-t4">تم العثور على مهمة طباعة. جارٍ قراءة إعداداتها…</div></div>
+                <div class="box" id="w-banner" style="top:96px; height:70px; opacity:0; background:#e8f4ea; border-right-color:#2e7d32">
+                  <div class="res-ico ic" style="position:absolute; width:22px; height:22px; top:14px; background:#2e7d32"><svg viewBox="0 0 20 20" style="left:5px; top:5px; width:12px; height:12px"><path d="M4 10.5 L8.2 14.5 L16 6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  <b>يستخدم برنامج التذاكر إعدادات التذكرة</b>
+                  <div style="top:34px; font-size:12.5px">طلبت مهمة الطباعة إعدادات تذكرة AMWAG. لا يلزم تغيير أي شيء.</div>
+                </div>
+                <div class="tbl" id="w-tbl">
+                  <div class="tbl-h"><span class="c1">الإعداد</span><span class="c2">ما طلبه برنامج التذاكر</span><span class="c3">إعداد تذكرة AMWAG</span></div>
+                  <div class="tr" id="w-r1" style="top:44px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1">حجم الورق</span><small>مطابق</small><span class="c2"><bdi>AMWAG Ticket</bdi></span><span class="c3"><bdi>AMWAG Ticket</bdi></span></div>
+                  <div class="tr" id="w-r2" style="top:88px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1">الاتجاه</span><small>مطابق</small><span class="c2">عمودي</span><span class="c3">عمودي</span></div>
+                  <div class="tr" id="w-r3" style="top:132px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1">الطباعة على الوجهين</span><small>مطابق</small><span class="c2">متوقفة (وجه واحد)</span><span class="c3">متوقفة (وجه واحد)</span></div>
+                  <div class="tr" id="w-r4" style="top:176px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1">مصدر الورق</span><small>مطابق</small><span class="c2">الدرج متعدد الأغراض</span><span class="c3">الدرج متعدد الأغراض</span></div>
+                </div>
+              </div></div>
+
+              <div class="v" id="v-choose"><div class="vin">
+                <div class="v-h">اختر طابعة التذاكر</div>
+                <div class="v-p">تم العثور على أكثر من طابعة مدعومة. اختر الطابعة التي يطبع عليها هذا الجهاز التذاكر.</div>
+                <div class="pcard" style="top:104px"><div class="sel" id="c-sel"></div><div class="card-h">TA P-4030DN</div>
+                  <div class="row" style="top:38px"><b>الاتصال</b><span>كابل USB، المنفذ USB001</span></div><div class="row" style="top:64px"><b>الحالة</b><span>موصولة</span></div>
+                  <div class="row" style="top:90px"><b>اسم الطابعة</b><span><bdi>AMWAG Ticket Printer</bdi></span></div><div class="row" style="top:116px"><b>طريقة التعرّف</b><span>أبلغت الطابعة عن طرازها بدقة</span></div></div>
+                <div class="pcard" style="top:266px; height:124px"><div class="card-h">TA P-4531DN</div>
+                  <div class="row" style="top:38px"><b>الاتصال</b><span>الشبكة، العنوان 10.0.0.5</span></div><div class="row" style="top:64px"><b>اسم الطابعة</b><span><bdi>TA P-4531DN (Office)</bdi></span></div>
+                  <div class="row" style="top:90px"><b>طريقة التعرّف</b><span>تم التعرّف عليها من برنامج التشغيل المثبّت</span></div></div>
+                <div class="btn btn-d" id="c-cont-off" style="top:420px; width:96px">متابعة</div>
+                <div class="btn btn-a" id="c-cont" style="top:420px; width:96px; opacity:0"><i></i><label>متابعة</label></div>
+                <div class="btn btn-o" style="top:420px; width:96px; right:106px">إلغاء</div>
+              </div></div>
+
+              <div class="v" id="v-net"><div class="vin">
+                <div class="v-h">أدخل عنوان الطابعة على الشبكة</div>
+                <div class="v-p">لم يتم العثور على طابعة تذاكر تلقائيًا. قد لا يُعثر تلقائيًا على طابعة شبكة لم يسبق إعدادها على هذا الجهاز.</div>
+                <div class="v-strong" style="top:150px">عنوان IP أو اسم المضيف</div>
+                <div class="field" id="n-field" style="top:176px"><span class="txt" id="n-txt"></span><span class="caret" id="n-caret"></span></div>
+                <div class="v-p" style="top:214px; font-size:12px">يظهر العنوان في صفحة حالة الطابعة، مثل 192.168.1.50.</div>
+                <div class="btn btn-a" id="n-find" style="top:420px; width:150px"><i></i><label>البحث عن الطابعة</label></div>
+                <div class="btn btn-o" style="top:420px; width:96px; right:160px">إلغاء</div>
+              </div></div>
+
+              <div class="v" id="v-confirm"><div class="vin">
+                <div class="v-h">هل هذه هي الطابعة الصحيحة؟</div>
+                <div class="v-p v-strong" style="font-weight:400">تُعرّف الطابعة الموجودة على العنوان 10.0.0.5 نفسها بالاسم «<bdi>TA Triumph-Adler P-4531DN</bdi>». هل هي من طراز <bdi>TA P-4531DN</bdi>؟</div>
+                <div class="v-p" style="top:112px">اختر «نعم» فقط إذا كان الملصق الموجود على الطابعة يُظهر هذا الطراز.</div>
+                <div class="btn btn-a" id="f-yes" style="top:420px; width:96px"><i></i><label>نعم</label></div>
+                <div class="btn btn-o" style="top:420px; width:96px; right:106px">لا</div>
+              </div></div>
+
+              <div class="v" id="v-declined"><div class="vin">
+                <div class="res-ico" style="top:22px; background:#e08a00"><svg viewBox="0 0 20 20"><path d="M10 4 L10 11.5" stroke="#fff" stroke-width="2.8" stroke-linecap="round"></path><circle cx="10" cy="15.5" r="1.7" fill="#fff"></circle></svg></div>
+                <div class="res-t" style="color:#9a5b00">لم يتم منح الإذن</div>
+                <div class="res-p">لم يحصل Windows على إذن تثبيت برنامج التشغيل، لذلك لم يتم تغيير أي شيء. اختر «حاول مرة أخرى»، ثم اختر «نعم» عندما يطلب Windows ذلك.</div>
+                <div class="box warn" style="top:126px; height:88px">
+                  <svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg>
+                  <b>لم يتم منح الإذن</b><div style="top:34px">لم يتم تغيير أي شيء. اختر «حاول مرة أخرى»، ثم اختر «نعم» عندما يطلب Windows ذلك.</div>
+                </div>
+                <div class="btn btn-a" id="d-retry" style="top:380px; width:126px"><i></i><label>حاول مرة أخرى</label></div>
+                <div class="btn btn-o" style="top:380px; width:96px; right:136px">إغلاق</div>
+                <div class="lnk" style="top:440px; right:10px">حفظ التقرير…</div><div class="lnk" style="top:440px; right:116px">نسخ التقرير</div><div class="lnk" style="top:440px; right:216px; color:#b4bec8">فتح مجلد السجلات</div>
+              </div></div>
+
+              <div class="v" id="v-guide"><div class="vin">
+                <div class="v-h">طباعة تذكرة اختبار</div>
+                <div class="v-p v-strong">أبلغت عن مشكلة في تذكرة الاختبار. تحقّق مما يلي:</div>
+                <div class="gi" style="top:96px"><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg><div>مائلة أو غير متمركزة: اضبط موجّهات الورق في الدرج متعدد الأغراض على عرض ورق التذكرة.</div></div>
+                <div class="gi" style="top:150px"><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg><div>حجم خاطئ أو مُصغّر: من لوحة الطابعة اضبط حجم الورق للدرج متعدد الأغراض على حجم التذكرة (مخصّص)، ثم شغّل «إصلاح».</div></div>
+                <div class="gi" style="top:204px"><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg><div>مقطوعة عند الحافة: لا تطبع الطابعات على مسافة 4 مم من حافة الورقة. أبقِ محتوى التذكرة داخل منطقة الأمان المتقطعة.</div></div>
+                <div class="gi" style="top:258px"><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg><div>سُحبت من درج خاطئ: من لوحة الطابعة راجع إعدادات الدرج متعدد الأغراض (حجم الورق ونوعه).</div></div>
+                <div class="btn btn-a" style="top:420px; width:96px">إصلاح</div>
+                <div class="btn btn-o" style="top:420px; width:120px; right:106px">طباعة مرة أخرى</div>
+                <div class="btn btn-o" style="top:420px; width:96px; right:236px">تم</div>
+              </div></div>
+
+              <div class="v" id="v-status"><div class="vin">
+                <div class="v-h">طباعة تذكرة اختبار</div>
+                <div class="v-strong" style="top:62px">في قائمة انتظار الطباعة…</div>
+                <div class="ring" id="q-ring" style="top:96px"></div>
+                <div class="box warn" style="top:150px; height:70px">
+                  <svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#e08a00"></circle><path d="M10 5 L10 11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path><circle cx="10" cy="14.6" r="1.4" fill="#fff"></circle></svg>
+                  <b>أبلغت الطابعة عن مشكلة</b><div style="top:36px">نفد الورق من الطابعة. ضع ورق التذاكر في الدرج متعدد الأغراض.</div>
+                </div>
+                <div class="btn btn-o" style="top:420px; width:96px">رجوع</div>
+              </div></div>
+
+              <div class="v" id="v-notready"><div class="vin">
+                <div class="res-ico" style="top:22px; background:#c62828"><svg viewBox="0 0 20 20"><path d="M6 6 L14 14 M14 6 L6 14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"></path></svg></div>
+                <div class="res-t" style="color:#c62828">الطابعة غير جاهزة</div>
+                <div class="res-p">تعذّر تأكيد بعض الإعدادات. شغّل «إصلاح» أو حاول مرة أخرى.</div>
+                <div class="card" style="top:96px; height:128px">
+                  <div class="card-t">ما الذي حدث</div>
+                  <div class="row" style="top:40px"><b>حجم الورق الافتراضي</b><span style="right:160px; color:#c62828; font-weight:600">فشل</span></div>
+                  <div class="row" style="top:64px"><b></b><span style="right:16px; color:#56616b">المتوقع: <bdi>AMWAG Ticket</bdi>   الموجود: <bdi>A4</bdi></span></div>
+                  <div class="row" style="top:92px"><b>مصدر الورق</b><span style="right:160px; color:#2e7d32">ناجح</span></div>
+                </div>
+                <div class="btn btn-a" style="top:380px; width:126px">حاول مرة أخرى</div>
+                <div class="btn btn-o" id="x-repair" style="top:380px; width:96px; right:136px">إصلاح</div>
+                <div class="btn btn-o" style="top:380px; width:96px; right:242px">إغلاق</div>
+                <div class="lnk" style="top:440px; right:10px">فحص برنامج التذاكر</div><div class="lnk" style="top:440px; right:174px">حفظ التقرير…</div>
+                <div class="lnk" id="x-copy" style="top:440px; right:280px">نسخ التقرير</div><div class="lnk" style="top:440px; right:380px; color:#b4bec8">فتح مجلد السجلات</div>
+                <div class="lnk" id="x-copied" style="top:476px; right:10px; color:#2e7d32; font-weight:600; opacity:0">تم نسخ التقرير</div>
+              </div></div>
+
+            </div>
+          </div>
+          <div class="ft" data-layout-ignore><span style="right:27px">© 2026 أمواج ترافيل · إدارة تكنولوجيا المعلومات</span><span style="left:27px">تطوير&#160;&#160;&#160;<b style="color:#15191d; font-weight:600">م. عبدالحميد الشوربجي ↗</b></span></div>
+        </div>
+
+        <div class="shade" id="tu-shade" data-layout-allow-occlusion></div>
+        <div class="dlg" id="tu-dlg" data-layout-allow-occlusion data-layout-allow-overlap>
+          <div class="dlg-h">التحكم في حساب المستخدم</div>
+          <div class="dlg-q">هل تريد السماح لهذا التطبيق بإجراء تغييرات على جهازك؟</div>
+          <div class="dlg-app"><img src="assets/img/app-icon.png" alt="" /><span>AMWAG Printer Setup</span></div>
+          <div class="dlg-f"><div class="dlg-b dlg-yes"><i id="tu-yes-press"></i><label>نعم</label></div><div class="dlg-b dlg-no">لا</div></div>
+        </div>
+        <div class="dlg admin" id="tu-admin" data-layout-allow-occlusion data-layout-allow-overlap>
+          <div class="dlg-h">التحكم في حساب المستخدم</div>
+          <div class="dlg-q">هل تريد السماح لهذا التطبيق بإجراء تغييرات على جهازك؟</div>
+          <div class="dlg-app"><img src="assets/img/app-icon.png" alt="" /><span>AMWAG Printer Setup</span></div>
+          <div class="dlg-h" style="top:166px">للمتابعة، أدخل اسم مستخدم وكلمة مرور المسؤول.</div>
+          <div class="dlg-in" style="top:192px">اسم المستخدم</div>
+          <div class="dlg-in" style="top:232px">كلمة المرور</div>
+          <div class="dlg-f"><div class="dlg-b dlg-yes"><label>نعم</label></div><div class="dlg-b dlg-no">لا</div></div>
+        </div>
+        <div class="spot" id="tu-spot" data-layout-allow-occlusion></div>
+        <svg class="cursor" id="tu-cursor" viewBox="0 0 24 36" aria-hidden="true"><path d="M1.5 1.5 L1.5 28 L8 21.8 L12.4 32.4 L17 30.4 L12.6 20 L21.5 20 Z" fill="#ffffff" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const C = JSON.parse(vars.cues || "{}");
+      const c = (name, fallback) => (C[name] !== undefined ? C[name] : fallback);
+      const root = document.querySelector(".scene-tu");
+      const tl = gsap.timeline({ paused: true });
+
+      // ---------- Step list (app strings, Localization/Strings.Steps.cs) ----------
+      const STEPS = [
+        ["البحث عن الطابعة", "جارٍ البحث عن الطابعة…", "تم العثور على الطابعة"],
+        ["فحص برنامج التشغيل", "جارٍ فحص برنامج تشغيل الطابعة…", "سيتم تثبيت برنامج التشغيل"],
+        ["تثبيت برنامج التشغيل", "جارٍ تثبيت برنامج تشغيل الطابعة…", "تم تثبيت برنامج التشغيل"],
+        ["ضبط حجم التذكرة", "جارٍ ضبط حجم ورق التذكرة…", "تم ضبط حجم التذكرة"],
+        ["التحقق", "جارٍ التحقق من حفظ الإعدادات…", "تم التحقق من جميع الإعدادات"],
+        ["جاهزة للطباعة", "جارٍ الإنهاء…", "جاهزة لطباعة التذاكر"],
+      ];
+      const ICONS = '<svg class="ok" viewBox="0 0 14 14"><path d="M3 7.3 L6 10.2 L11.2 4.4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '<svg class="bang" viewBox="0 0 14 14"><path d="M7 3 L7 8.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="7" cy="11" r="1.2" fill="#fff"/></svg>' +
+        '<svg class="x" viewBox="0 0 14 14"><path d="M4 4 L10 10 M10 4 L4 10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>' +
+        '<svg class="dash" viewBox="0 0 14 14"><path d="M3.5 7 L10.5 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>';
+      const stepsEl = document.getElementById("tu-steps");
+      STEPS.forEach((s, i) => {
+        const top = 24 + 56 * i;
+        if (i < 5) { const ln = document.createElement("div"); ln.className = "st-line"; ln.style.top = top + 34 + "px"; ln.innerHTML = '<i id="sl' + i + '"></i>'; stepsEl.appendChild(ln); }
+        const el = document.createElement("div");
+        el.className = "st"; el.style.top = top + "px";
+        el.innerHTML = '<div class="st-g" id="sg' + i + '" data-state="wait">' + ICONS + '</div><div class="st-t"></div><div class="st-s" id="ss' + i + '" data-state="wait">في الانتظار</div>';
+        el.querySelector(".st-t").textContent = s[0];
+        stepsEl.appendChild(el);
+      });
+      // One step changes state: glyph, status text and colour, and the connector below it.
+      function step(i, state, text, at) {
+        tl.set("#sg" + i, { attr: { "data-state": state } }, at);
+        tl.set("#ss" + i, { attr: { "data-state": state }, textContent: text }, at);
+        if (i < 5) tl.set("#sl" + i, { opacity: state === "done" || state === "warn" ? 1 : 0 }, at);
+        if (state === "done" || state === "warn" || state === "fail") tl.fromTo("#sg" + i, { scale: 0.45 }, { scale: 1, duration: 0.35, ease: "expo.out", immediateRender: false }, at);
+      }
+      function spin(sel, from, to) { if (to > from) tl.fromTo(sel, { rotation: 0 }, { rotation: 360 * Math.max(1, Math.round((to - from) / 0.9)), duration: to - from, ease: "none", immediateRender: false }, from); }
+      function steps(states, at) { states.forEach((s, i) => step(i, s[0], s[1], at)); }
+
+      // ---------- Ticket rulers ----------
+      const NS = "http://www.w3.org/2000/svg", rulers = document.getElementById("tu-tk-rulers");
+      const ln = (x1, y1, x2, y2) => { const l = document.createElementNS(NS, "line"); l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2); rulers.appendChild(l); };
+      const lb = (x, y, t) => { const e = document.createElementNS(NS, "text"); e.setAttribute("x", x); e.setAttribute("y", y); e.setAttribute("font-size", "2"); e.setAttribute("fill", "#30363d"); e.setAttribute("stroke", "none"); e.textContent = t; rulers.appendChild(e); };
+      for (let mm = 5; mm < 83; mm += 5) { ln(mm, 9, mm, mm % 10 === 0 ? 12.4 : 10.8); if (mm % 10 === 0 && mm < 80) lb(mm - 1.2, 15, String(mm)); }
+      for (let mm = 5; mm < 170; mm += 5) { ln(9, mm, mm % 10 === 0 ? 12.4 : 10.8, mm); if (mm % 10 === 0 && mm > 10 && mm < 160) lb(1.6, mm + 0.7, String(mm)); }
+
+      // ---------- Captions beside the window ----------
+      const sections = C.sections || [];
+      const capsEl = document.getElementById("tu-caps");
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      sections.forEach((s, i) => {
+        const el = document.createElement("div");
+        el.className = "cap" + (s.ticket ? " top" : "");
+        el.id = "cap" + i;
+        el.innerHTML = '<div class="cap-label"></div><div class="cap-title"></div>' + (s.help ? '<div class="cap-help"></div>' : "");
+        el.querySelector(".cap-label").textContent = s.label;
+        el.querySelector(".cap-title").innerHTML = esc(s.title).replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>');
+        if (s.help) el.querySelector(".cap-help").textContent = s.help;
+        capsEl.appendChild(el);
+        const end = i + 1 < sections.length ? sections[i + 1].at - 0.2 : null;
+        tl.fromTo(el, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, s.at);
+        if (end !== null) tl.to(el, { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, end);
+        else tl.to(el, { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, c("exit", 60) - 0.1);
+        const m = /الخطوة (\d)/.exec(s.label);
+        tl.to("#tu-rail", { opacity: m && !s.ticket ? 1 : 0, duration: 0.25 }, s.at);
+        if (m) Array.from(document.querySelectorAll("#tu-rail i")).forEach((bar, k) =>
+          tl.to(bar, { backgroundColor: k + 1 < +m[1] ? "#f5b642" : k + 1 === +m[1] ? "#ffffff" : "rgba(255,255,255,0.18)", duration: 0.3 }, s.at));
+      });
+
+      // ---------- Geometry helpers (window space, 840 x 668; Arabic layout) ----------
+      const BASE = 1.2, HOME = { scale: BASE, x: 0, y: 0 };
+      const focus = (x, y, z) => { const s = BASE * z; return { scale: s, x: Math.min(0, Math.max(1008 - 840 * s, 504 - x * s)), y: Math.min(0, Math.max(802 - 668 * s, 401 - y * s)) }; };
+      const camTo = (st, at, d = 0.7) => tl.to("#tu-cam", { ...st, duration: d, ease: "power2.inOut" }, at);
+      function spot(x, y, rx, ry, inAt, outAt) {
+        tl.set("#tu-spot", { "--sx": (x / 8.4).toFixed(2) + "%", "--sy": (y / 6.68).toFixed(2) + "%", "--srx": rx + "%", "--sry": ry + "%" }, inAt);
+        tl.fromTo("#tu-spot", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out", immediateRender: false }, inAt);
+        tl.to("#tu-spot", { opacity: 0, duration: 0.25, ease: "power2.in" }, outAt);
+      }
+      function cursorTo(x, y, from, arrive, appearFrom) {
+        if (appearFrom) tl.fromTo("#tu-cursor", { x: appearFrom[0], y: appearFrom[1], opacity: 0 }, { opacity: 1, duration: 0.15, immediateRender: false }, from);
+        tl.to("#tu-cursor", { x, y, duration: Math.max(0.35, arrive - from), ease: "power2.inOut" }, from);
+      }
+      function click(at, press) {
+        tl.to("#tu-cursor", { scale: 0.88, duration: 0.05, ease: "power1.out", transformOrigin: "0 0" }, at);
+        tl.to("#tu-cursor", { scale: 1, duration: 0.08, ease: "power1.out" }, at + 0.05);
+        if (press) { tl.to(press, { opacity: 1, duration: 0.05 }, at); tl.to(press, { opacity: 0, duration: 0.15 }, at + 0.12); }
+      }
+      const hideCursor = (at) => tl.to("#tu-cursor", { opacity: 0, duration: 0.2 }, at);
+      function show(id, at, prev) {
+        if (prev) tl.to(prev, { opacity: 0, filter: "blur(6px)", duration: 0.14, ease: "power2.in" }, at - 0.05);
+        tl.fromTo(id, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "power2.out", immediateRender: false }, at);
+      }
+      const swapText = (ids, times) => ids.forEach((id, i) => { tl.set(id, { opacity: 1 }, times[i]); if (times[i + 1] !== undefined) tl.set(id, { opacity: 0 }, times[i + 1]); });
+
+      // ---------- The run ----------
+      tl.set("#tu-cam", HOME, 0);
+      tl.fromTo("#tu-wave", { x: -118 }, { x: -118 - 11 * c("exit", 60), duration: c("exit", 60) + 0.5, ease: "none" }, 0);
+      tl.fromTo("#tu-view", { opacity: 0, scale: 0.94, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0);
+      tl.set("#v-progress", { opacity: 1 }, 0);
+
+      // Detection and driver
+      const D = c("detectRun", 0.4), DD = c("detectDone", 6), CR = c("checkRun", 8), CD = c("checkDone", 9), IR = c("installRun", 9.3);
+      step(0, "run", STEPS[0][1], D); spin("#sg0", D, DD); step(0, "done", STEPS[0][2], DD);
+      step(1, "run", STEPS[1][1], CR); spin("#sg1", CR, CD); step(1, "done", STEPS[1][2], CD);
+      const ID = c("installDone", 30);
+      step(2, "run", STEPS[2][1], IR); spin("#sg2", IR, ID); step(2, "done", STEPS[2][2], ID);
+      const CF = c("configRun", 30.3), CFD = c("configDone", 34), VR = c("verifyRun", 35), VD = c("verifyDone", 37), RR = c("readyRun", 37.2), RD = c("readyDone", 38);
+      step(3, "run", STEPS[3][1], CF); spin("#sg3", CF, CFD); step(3, "done", STEPS[3][2], CFD);
+      step(4, "run", STEPS[4][1], VR); spin("#sg4", VR, VD); step(4, "done", STEPS[4][2], VD);
+      step(5, "run", STEPS[5][1], RR); spin("#sg5", RR, RD); step(5, "done", STEPS[5][2], RD);
+      spin("#p-ring", 0, RD);
+      swapText(["#p-t0", "#p-t1", "#p-t2", "#p-t3", "#p-t4", "#p-t5", "#p-t6"], [0, D, CR, IR, CF, VR, RR]);
+      tl.set("#p-t6", { opacity: 0 }, RD + 0.2);
+      swapText(["#p-d1", "#p-d2"], [c("phaseIntegrity", 10), c("phaseInstalling", 12)]);
+      tl.set("#p-d2", { opacity: 0 }, ID);
+      tl.set("#p-d3", { opacity: 1 }, CF); tl.set("#p-d3", { opacity: 0 }, CFD);
+
+      spot(68, 74, 9, 8, c("langSpot", 2), c("langSpotOut", 4));
+      spot(716, 300, 17, 30, c("listSpot", 5), c("listSpotOut", 8));
+      tl.fromTo("#p-card", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out", immediateRender: false }, c("cardIn", 7));
+      for (let r = 1; r <= 5; r++) tl.fromTo("#p-r" + r, { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, c("cardIn", 7) + 0.1 + 0.15 * (r - 1));
+      spot(293, 410, 34, 17, c("cardSpot", 7.2), c("cardSpotOut", 9));
+      spot(23, 16, 6, 5, c("closeSpot", 20), c("closeSpotOut", 24));
+
+      // Windows permission
+      tl.to("#p-card", { y: 80, duration: 0.45, ease: "power3.out" }, c("noticeIn", 25));
+      tl.fromTo("#p-notice", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out", immediateRender: false }, c("noticeIn", 25) + 0.1);
+      camTo(focus(293, 349, 1.45), c("noticePunch", 25.2));
+      camTo(HOME, c("noticePunchOut", 29), 0.6);
+      tl.fromTo("#tu-shade", { opacity: 0 }, { opacity: 1, duration: 0.25, immediateRender: false }, c("dialogIn", 30));
+      tl.fromTo("#tu-dlg", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out", immediateRender: false }, c("dialogIn", 30) + 0.05);
+      cursorTo(525, 421, c("cursorYes", 30.5), c("yesArrive", 33), [300, 600]);
+      spot(525, 421, 18, 8, c("yesSpot", 31), c("dialogOut", 34));
+      click(c("yesClick", 33.3), "#tu-yes-press");
+      tl.to("#tu-dlg", { opacity: 0, scale: 0.97, duration: 0.18, ease: "power2.in" }, c("dialogOut", 33.5));
+      tl.to("#tu-shade", { opacity: 0, duration: 0.25 }, c("dialogOut", 33.5) + 0.05);
+      hideCursor(c("dialogOut", 33.5) + 0.2);
+      tl.to("#p-notice", { opacity: 0, duration: 0.25 }, c("noticeOut", 35));
+      tl.to("#p-card", { y: 0, duration: 0.45, ease: "power3.inOut" }, c("noticeOut", 35) + 0.1);
+      tl.fromTo("#p-r5-hl", { opacity: 0 }, { opacity: 1, duration: 0.3, immediateRender: false }, c("sizeRow", 40));
+      tl.to("#p-r5-hl", { opacity: 0, duration: 0.4 }, c("sizeRowOut", 44));
+
+      // Ready
+      const RI = c("resultIn", 50);
+      show("#v-result", RI, "#v-progress");
+      tl.fromTo("#r-ico", { scale: 0.5 }, { scale: 1, duration: 0.45, ease: "expo.out", immediateRender: false }, RI);
+      camTo(focus(296, 160, 1.42), c("resultPunch", RI + 0.3));
+      camTo(HOME, c("resultPunchOut", RI + 4), 0.6);
+      spot(293, 314, 34, 20, c("summarySpot", RI + 4.5), c("summarySpotOut", RI + 8));
+
+      // Test ticket
+      cursorTo(482, 517, c("pttCursor", 60), c("pttArrive", 62), [640, 620]);
+      spot(482, 517, 16, 8, c("pttSpot", 60.3), c("pttClick", 63) + 0.1);
+      click(c("pttClick", 63), "#r-ptt i");
+      show("#v-test", c("testView", 63.2), "#v-result");
+      cursorTo(509, 517, c("testView", 63.2) + 0.6, c("printArrive", 66));
+      spot(509, 517, 12, 8, c("printSpot", 65), c("printClick", 67) + 0.1);
+      click(c("printClick", 67), "#t-print i");
+      hideCursor(c("printClick", 67) + 0.3);
+      tl.fromTo("#t-row", { opacity: 0 }, { opacity: 1, duration: 0.15, immediateRender: false }, c("sending", 67.2));
+      spin("#t-ring", c("sending", 67.2), c("sentView", 71));
+      swapText(["#t-t1", "#t-t2"], [c("sending", 67.2), c("printing", 69)]);
+      show("#v-sent", c("sentView", 71), "#v-test");
+      tl.fromTo("#tu-slot", { opacity: 0, scaleX: 0.7 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "expo.out", immediateRender: false }, c("slotIn", 68.5));
+      tl.set("#tu-tk", { opacity: 1 }, c("feed", 69));
+      tl.fromTo("#tu-tk", { y: -640 }, { y: 0, duration: 1.4, ease: "power2.out", immediateRender: false }, c("feed", 69));
+      camTo(focus(293, 265, 1.42), c("checksPunch", 72));
+      [["#s-c1", "#tu-tl1", "#tu-hl-corners", "corners"], ["#s-c2", "#tu-tl2", "#tu-hl-bars", "bars"], ["#s-c3", "#tu-tl3", "#tu-hl-top", "upright"], ["#s-c4", "#tu-tl4", "#tu-hl-edge", "tray"]]
+        .forEach(([chk, lbl, hl, cue], i) => {
+          const at = c(cue, 73 + i);
+          tl.fromTo(chk, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out", immediateRender: false }, at);
+          tl.fromTo(hl, { opacity: 0 }, { opacity: 1, duration: 0.25, immediateRender: false }, at);
+          tl.fromTo(lbl, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out", immediateRender: false }, at);
+        });
+      camTo(HOME, c("checksPunchOut", 80), 0.6);
+      cursorTo(482, 517, c("okCursor", 80), c("okArrive", 82), [640, 620]);
+      spot(482, 517, 16, 8, c("okSpot", 80.3), c("okClick", 82.3) + 0.1);
+      click(c("okClick", 82.3), "#s-ok i");
+      show("#v-result", c("resultBack", 82.5), "#v-sent");
+      tl.to(["#tu-tkclip", "#tu-slot", "#tu-tklabels"], { opacity: 0, y: 40, duration: 0.4, ease: "power2.in" }, c("ticketOut", 82.4));
+
+      // Ticket software
+      cursorTo(487, 566, c("resultBack", 82.5) + 0.3, c("softArrive", 85));
+      spot(487, 566, 14, 6, c("softSpot", 84), c("softClick", 85.3) + 0.1);
+      tl.set("#r-soft", { textDecoration: "underline" }, c("softArrive", 85));
+      click(c("softClick", 85.3));
+      hideCursor(c("softClick", 85.3) + 0.3);
+      show("#v-soft", c("softView", 85.5), "#v-result");
+      const JF = c("jobFound", 90);
+      spin("#w-ring", c("softView", 85.5), c("banner", 92));
+      swapText(["#w-t1", "#w-t2", "#w-t3", "#w-t4"], [c("softView", 85.5), c("softView", 85.5) + 1, c("softView", 85.5) + 2, JF]);
+      tl.to("#w-row", { opacity: 0, duration: 0.15 }, c("banner", 92) - 0.15);
+      tl.fromTo("#w-banner", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out", immediateRender: false }, c("banner", 92));
+      tl.fromTo("#w-tbl", { opacity: 0 }, { opacity: 1, duration: 0.25, immediateRender: false }, c("banner", 92) + 0.1);
+      [1, 2, 3, 4].forEach((i) => tl.fromTo("#w-r" + i, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out", immediateRender: false }, c("row" + i, 92 + i * 0.5)));
+      camTo(focus(293, 407, 1.42), c("tablePunch", 92.2));
+      camTo(HOME, c("tablePunchOut", 98), 0.6);
+
+      // Situations: the run starts again, this time with questions
+      const CR0 = c("casesReset", 100);
+      tl.to("#tu-view", { opacity: 0.0, duration: 0.2, ease: "power2.in" }, CR0 - 0.2);
+      tl.set(["#v-soft"], { opacity: 0 }, CR0);
+      tl.set("#v-progress", { opacity: 1, filter: "blur(0px)" }, CR0);
+      tl.set("#p-card", { opacity: 0 }, CR0);
+      tl.set(["#p-t6"], { opacity: 0 }, CR0); tl.set("#p-t1", { opacity: 1 }, CR0);
+      steps([["run", STEPS[0][1]], ["wait", "في الانتظار"], ["wait", "في الانتظار"], ["wait", "في الانتظار"], ["wait", "في الانتظار"], ["wait", "في الانتظار"]], CR0);
+      tl.to("#tu-view", { opacity: 1, duration: 0.3, ease: "power2.out" }, CR0);
+      spin("#sg0", CR0, c("netView", 110));
+      spin("#sg0", c("findClick", 115.3) + 0.15, c("declinedView", 124));
+      spin("#p-ring", CR0, c("chooseView", 103));
+
+      show("#v-choose", c("chooseView", 103), "#v-progress");
+      spot(293, 262, 34, 15, c("cardsSpot", 104), c("pickClick", 105) + 0.2);
+      cursorTo(330, 262, c("chooseView", 103) + 0.3, c("pickArrive", 105), [640, 620]);
+      click(c("pickClick", 105.3));
+      tl.to("#c-sel", { opacity: 1, duration: 0.15 }, c("pickClick", 105.3));
+      tl.set("#c-cont", { opacity: 1 }, c("pickClick", 105.3)); tl.set("#c-cont-off", { opacity: 0 }, c("pickClick", 105.3));
+      spot(509, 537, 12, 8, c("contSpot", 107), c("contClick", 107.6) + 0.1);
+      cursorTo(509, 537, c("pickClick", 105.3) + 0.3, c("contArrive", 107.3));
+      click(c("contClick", 107.6), "#c-cont i");
+      step(0, "warn", "تم العثور عليها مع تحذيرات", c("netView", 110));
+      show("#v-net", c("netView", 110), "#v-choose");
+      spot(397, 308, 22, 8, c("fieldSpot", 112), c("typeEnd", 114) + 0.3);
+      cursorTo(450, 308, c("netView", 110) + 0.4, c("typeStart", 113) - 0.2);
+      click(c("typeStart", 113) - 0.15);
+      const ip = "10.0.0.25", TS = c("typeStart", 113), TE = c("typeEnd", 114);
+      tl.set("#n-caret", { opacity: 1, left: 8 }, TS);
+      for (let k = 1; k <= ip.length; k++) { const at = TS + ((TE - TS) * k) / ip.length; tl.set("#n-txt", { textContent: ip.slice(0, k) }, at); tl.set("#n-caret", { left: 8 + k * 7.4 }, at); }
+      tl.set("#n-caret", { opacity: 0 }, c("findClick", 115) - 0.05);
+      cursorTo(482, 537, TE + 0.1, c("findArrive", 115));
+      click(c("findClick", 115.3), "#n-find i");
+      step(0, "run", STEPS[0][1], c("findClick", 115.3) + 0.15);
+      show("#v-confirm", c("confirmView", 117), "#v-net");
+      spot(260, 205, 34, 9, c("confirmView", 117) + 0.4, c("yes2Click", 122));
+      tl.fromTo("#tu-plabel", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out", immediateRender: false }, c("labelCard", 119));
+      tl.fromTo("#tu-plabel-ring", { opacity: 0 }, { opacity: 1, duration: 0.25, immediateRender: false }, c("labelCard", 119) + 0.5);
+      tl.to("#tu-plabel", { opacity: 0, y: 20, duration: 0.3, ease: "power2.in" }, c("declinedView", 124) - 0.1);
+      cursorTo(509, 537, c("yes2Arrive", 121.5) - 0.5, c("yes2Arrive", 121.5));
+      click(c("yes2Click", 122), "#f-yes i");
+      hideCursor(c("yes2Click", 122) + 0.3);
+      // Declined permission: Windows said No, nothing changed
+      const DV = c("declinedView", 124);
+      steps([["done", "تم العثور على الطابعة"], ["done", "برنامج التشغيل جاهز"], ["skip", "لم تبدأ؛ لم يتم تغيير أي شيء"], ["skip", "لم يتم الوصول إليها"], ["skip", "لم يتم الوصول إليها"], ["skip", "لم يتم الوصول إليها"]], DV);
+      tl.set("#tu-cursor", { opacity: 0 }, DV);
+      show("#v-declined", DV, "#v-confirm");
+      spot(494, 517, 15, 8, c("retrySpot", 126), c("retryClick", 127) + 0.1);
+      cursorTo(494, 517, c("retrySpot", 126) - 0.2, c("retryArrive", 126.8), [640, 620]);
+      click(c("retryClick", 127.1), "#d-retry i");
+      hideCursor(c("retryClick", 127.1) + 0.3);
+      tl.fromTo("#tu-shade", { opacity: 0 }, { opacity: 1, duration: 0.25, immediateRender: false }, c("adminIn", 129));
+      tl.fromTo("#tu-admin", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out", immediateRender: false }, c("adminIn", 129) + 0.05);
+      tl.to("#tu-admin", { opacity: 0, scale: 0.97, duration: 0.2, ease: "power2.in" }, c("adminOut", 135));
+      tl.to("#tu-shade", { opacity: 0, duration: 0.25 }, c("adminOut", 135));
+
+      // Problems
+      const FS = c("fixSent", 137);
+      steps([["done", STEPS[0][2]], ["done", "برنامج التشغيل جاهز"], ["skip", "مثبّت بالفعل"], ["done", STEPS[3][2]], ["done", STEPS[4][2]], ["done", STEPS[5][2]]], FS);
+      tl.set(["#s-c1", "#s-c2", "#s-c3", "#s-c4"], { opacity: 0 }, FS);
+      show("#v-sent", FS, "#v-declined");
+      cursorTo(317, 517, FS + 0.3, c("problemArrive", 139), [640, 620]);
+      spot(317, 517, 17, 8, FS + 0.5, c("problemClick", 139.3) + 0.1);
+      click(c("problemClick", 139.3), "#s-bad i");
+      hideCursor(c("problemClick", 139.3) + 0.3);
+      show("#v-guide", c("guidanceView", 139.5), "#v-sent");
+      spot(293, 300, 36, 22, c("guideSpot", 140), c("statusView", 144) - 0.1);
+      show("#v-status", c("statusView", 144), "#v-guide");
+      spin("#q-ring", c("statusView", 144), c("notReadyView", 149));
+      spot(293, 302, 34, 9, c("problemSpot", 145), c("notReadyView", 149) - 0.1);
+      const NR = c("notReadyView", 149);
+      steps([["done", STEPS[0][2]], ["done", "برنامج التشغيل جاهز"], ["skip", "مثبّت بالفعل"], ["done", STEPS[3][2]], ["fail", "بعض الإعدادات غير صحيحة"], ["fail", "غير جاهزة"]], NR);
+      show("#v-notready", NR, "#v-status");
+      spot(373, 517, 13, 8, c("repairSpot", 150), c("copySpot", 153) - 0.1);
+      cursorTo(242, 566, c("copySpot", 153) - 0.2, c("copyArrive", 154), [500, 640]);
+      spot(242, 566, 12, 6, c("copySpot", 153), c("copied", 155) + 1.2);
+      click(c("copyClick", 154.3));
+      tl.fromTo("#x-copied", { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, c("copied", 154.5));
+      hideCursor(c("copyClick", 154.3) + 0.6);
+
+      // Leave
+      tl.to("#tu-view", { opacity: 0, scale: 0.97, filter: "blur(8px)", duration: 0.45, ease: "power2.in" }, c("exit", 160));
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["eg-tutorial"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,140 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "AmwagUI", sans-serif; color: #fff; direction: rtl; }
+    .op-ground { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%); }
+    .op-wave { position: absolute; left: -200px; bottom: -120px; width: 2400px; opacity: 0.07; }
+    .rail { position: absolute; right: 120px; top: 300px; display: flex; gap: 8px; }
+    .rail i { display: block; width: 64px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); }
+    .cap { position: absolute; right: 120px; top: 246px; width: 560px; }
+    .cap-label { font-size: 28px; font-weight: 600; color: #c9d5e6; }
+    .cap-title { margin-top: 62px; font-size: 54px; font-weight: 600; line-height: 1.22; }
+    .cap-help { margin-top: 22px; font-size: 30px; line-height: 1.45; color: #c9d5e6; }
+    .hl { color: #f5b642; }
+    .view { position: absolute; top: 62px; left: 96px; width: 1008px; height: 802px; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06); }
+    .cam { position: absolute; left: 0; top: 0; width: 840px; height: 668px; transform-origin: 0 0; }
+    .fx { position: absolute; inset: 0; background: #ffffff; color: #15191d; direction: rtl; }
+    .fx-tb { position: absolute; top: 0; left: 0; right: 0; height: 40px; background: #f3f3f3; }
+    .fx-tb-icon { position: absolute; right: 14px; top: 11px; width: 20px; height: 16px; background: #f5c44e; border-radius: 5px 2px 3px 3px; }
+    .fx-tb-title { position: absolute; right: 44px; top: 11px; font-size: 12px; direction: ltr; }
+    .fx-ctl { position: absolute; left: 0; top: 0; display: flex; direction: ltr; }
+    .fx-ctl span { display: block; width: 46px; height: 40px; text-align: center; line-height: 40px; font-size: 13px; }
+    .fx-addr { position: absolute; top: 40px; left: 0; right: 0; height: 46px; background: #f9f9f9; border-bottom: 1px solid #e5e5e5; }
+    .fx-nav { position: absolute; right: 14px; top: 13px; font-size: 14px; color: #56616b; letter-spacing: 10px; }
+    .fx-path { position: absolute; right: 96px; left: 16px; top: 8px; height: 30px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; font-size: 12px; line-height: 28px; padding-right: 12px; }
+    .fx-head { position: absolute; top: 86px; left: 0; right: 0; height: 30px; font-size: 11.5px; color: #56616b; border-bottom: 1px solid #ededed; }
+    .fx-head span { position: absolute; top: 0; line-height: 30px; }
+    .fx-row { position: absolute; left: 8px; right: 8px; height: 36px; border-radius: 4px; font-size: 13px; }
+    .fx-row span { position: absolute; top: 0; line-height: 36px; }
+    .c-name { right: 48px; direction: ltr; }
+    .c-type { right: 452px; color: #56616b; }
+    .fx-head .c-name { right: 56px; direction: rtl; }
+    .fx-head .c-type { right: 460px; }
+    .fx-ico { position: absolute; right: 16px; top: 8px; width: 20px; height: 20px; }
+    .ico-folder { background: #f5c44e; border-radius: 4px 2px 3px 3px; height: 15px; top: 11px; }
+    .ico-file { background: #fff; border: 1.5px solid #9aa5af; border-radius: 2px; width: 16px; right: 18px; }
+    .fx-hover, .fx-sel { position: absolute; inset: 0; border-radius: 4px; opacity: 0; }
+    .fx-hover { background: #e5f1fb; }
+    .fx-sel { background: #cce8ff; }
+    .fx-status { position: absolute; bottom: 0; left: 0; right: 0; height: 28px; font-size: 11.5px; color: #56616b; line-height: 28px; padding-right: 16px; border-top: 1px solid #ededed; }
+    .sp { position: absolute; left: 140px; top: 150px; width: 560px; height: 340px; background: #0f2a4a; border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); color: #fff; overflow: hidden; opacity: 0; direction: rtl; }
+    .sp-logo { position: absolute; left: 155px; top: 26px; width: 250px; }
+    .sp-title { position: absolute; left: 0; right: 0; top: 188px; text-align: center; font-size: 20px; font-weight: 600; }
+    .sp-row { position: absolute; left: 140px; right: 140px; top: 232px; height: 20px; font-size: 13px; color: #c9d5e6; }
+    .sp-row span { position: absolute; top: 0; white-space: nowrap; }
+    .sp-txt { right: 0; }
+    .sp-pct { left: 0; }
+    .sp-bar { position: absolute; left: 140px; width: 280px; top: 262px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+    .sp-fill { position: absolute; right: 0; top: 0; height: 6px; width: 280px; border-radius: 3px; background: #ffffff; transform-origin: 100% 50%; }
+    .sp-foot { position: absolute; left: 0; right: 0; top: 298px; height: 42px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 12px; color: #c9d5e6; }
+    .sp-foot span { position: absolute; top: 13px; }
+    .cursor { position: absolute; left: 0; top: 0; width: 24px; height: 36px; opacity: 0; }
+  </style>
+  <div id="root" class="scene-op" data-composition-id="eg-open" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"string","label":"Language","default":"ar"},{"id":"cues","type":"string","label":"Timing (generated)","default":"{}"}]'>
+    <div class="op-ground"></div>
+    <svg class="op-wave" id="op-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true"><path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path></svg>
+    <div class="rail" id="op-rail"><i id="op-r1"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="cap" id="op-cap"><div class="cap-label" id="op-label"></div><div class="cap-title" id="op-title"></div><div class="cap-help" id="op-help"></div></div>
+
+    <div class="view" id="op-view" data-layout-allow-overflow>
+      <div class="cam" id="op-cam">
+        <div class="fx" id="op-fx">
+          <div class="fx-tb"><div class="fx-tb-icon"></div><div class="fx-tb-title">AMWAG Printer Setup</div><div class="fx-ctl"><span>&#10005;</span><span>&#9744;</span><span>&#8212;</span></div></div>
+          <div class="fx-addr"><div class="fx-nav">&#8594;&#8592;&#8593;</div><div class="fx-path">سطح المكتب ‹ <bdi>AMWAG Printer Setup</bdi></div></div>
+          <div class="fx-head"><span class="c-name">الاسم</span><span class="c-type">النوع</span></div>
+          <div class="fx-row" style="top:122px"><div class="fx-ico ico-folder"></div><span class="c-name">docs</span><span class="c-type">مجلد ملفات</span></div>
+          <div class="fx-row" style="top:158px"><div class="fx-ico ico-folder"></div><span class="c-name">drivers</span><span class="c-type">مجلد ملفات</span></div>
+          <div class="fx-row" id="op-exe" style="top:194px"><div class="fx-hover" id="op-hover"></div><div class="fx-sel" id="op-sel"></div><img class="fx-ico" src="assets/img/app-icon.png" alt="" style="border-radius:4px" /><span class="c-name">AMWAG Printer Setup.exe</span><span class="c-type">تطبيق</span></div>
+          <div class="fx-row" style="top:230px"><div class="fx-ico ico-file"></div><span class="c-name">amwag-printer-config.json</span><span class="c-type">ملف JSON</span></div>
+          <div class="fx-row" style="top:266px"><div class="fx-ico ico-file"></div><span class="c-name">README.md</span><span class="c-type">ملف Markdown</span></div>
+          <div class="fx-row" style="top:302px"><div class="fx-ico ico-file"></div><span class="c-name">SHA256SUMS.txt</span><span class="c-type">مستند نصي</span></div>
+          <div class="fx-status">6 عناصر</div>
+        </div>
+        <div class="sp" id="op-splash">
+          <img class="sp-logo" src="assets/img/amwag-logo.svg" alt="AMWAG Travel" />
+          <div class="sp-title">إعداد الطابعة</div>
+          <div class="sp-row"><span class="sp-txt" id="op-t1">جارٍ تحميل الإعدادات…</span><span class="sp-txt" id="op-t2" style="opacity:0">جارٍ فتح النافذة…</span><span class="sp-pct" id="op-pct">0%</span></div>
+          <div class="sp-bar"><div class="sp-fill" id="op-fill"></div></div>
+          <div class="sp-foot"><span style="right:20px">الإصدار 1.0.0</span><span style="left:20px">© 2026 أمواج ترافيل · إدارة تكنولوجيا المعلومات</span></div>
+        </div>
+        <svg class="cursor" id="op-cursor" viewBox="0 0 24 36" aria-hidden="true"><path d="M1.5 1.5 L1.5 28 L8 21.8 L12.4 32.4 L17 30.4 L12.6 20 L21.5 20 Z" fill="#ffffff" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const C = JSON.parse(vars.cues || "{}");
+      const c = (n, f) => (C[n] !== undefined ? C[n] : f);
+      const sec = (C.sections || [])[0] || { label: "الخطوة 1 من 6", title: "افتح *البرنامج*", help: "" };
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      document.getElementById("op-label").textContent = sec.label;
+      document.getElementById("op-title").innerHTML = esc(sec.title).replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>');
+      document.getElementById("op-help").textContent = sec.help || "";
+
+      const tl = gsap.timeline({ paused: true });
+      const exit = c("exit", 10);
+      tl.fromTo("#op-wave", { x: -11 * 14 }, { x: -11 * (14 + exit + 0.5), duration: exit + 0.5, ease: "none" }, 0);
+      tl.set("#op-cam", { scale: 1.2, x: 0, y: 0 }, 0);
+      tl.fromTo("#op-view", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.05);
+      tl.fromTo("#op-cap", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 0.2);
+      tl.fromTo("#op-rail", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.25);
+      tl.fromTo("#op-r1", { backgroundColor: "rgba(255,255,255,0.18)" }, { backgroundColor: "#ffffff", duration: 0.3 }, 0.35);
+
+      // The pointer glides to the exe and double-clicks it on "دبل كليك".
+      const exe = { x: 700, y: 214 };
+      const clickAt = c("click1", 3), s = 1.2 * 1.7;
+      tl.fromTo("#op-cursor", { opacity: 0, x: 300, y: 560 }, { opacity: 1, duration: 0.15 }, c("cursorIn", 1));
+      tl.to("#op-cursor", { x: exe.x, y: exe.y, duration: Math.max(0.6, c("cursorArrive", 2.7) - c("cursorIn", 1)), ease: "power2.inOut" }, c("cursorIn", 1));
+      tl.to("#op-cam", { scale: s, x: Math.min(0, Math.max(1008 - 840 * s, 504 - 640 * s)), y: Math.min(0, Math.max(802 - 668 * s, 401 - 212 * s)), duration: 0.7, ease: "power2.inOut" }, c("punchIn", 2));
+      tl.to("#op-hover", { opacity: 1, duration: 0.1 }, c("cursorArrive", 2.7) - 0.1);
+      [c("click1", 3), c("click2", 3.16)].forEach((t) => {
+        tl.to("#op-cursor", { scale: 0.88, duration: 0.05, ease: "power1.out", transformOrigin: "0 0" }, t);
+        tl.to("#op-cursor", { scale: 1, duration: 0.07, ease: "power1.out" }, t + 0.05);
+      });
+      tl.to("#op-sel", { opacity: 1, duration: 0.05 }, clickAt);
+      tl.to("#op-cam", { scale: 1.2, x: 0, y: 0, duration: 0.6, ease: "power2.inOut" }, c("punchOut", 3.5));
+      tl.to("#op-cursor", { opacity: 0, duration: 0.15 }, c("splash", 3.8) + 0.1);
+
+      // The splash loads.
+      const sp = c("splash", 3.8), l2 = c("load2", 6);
+      tl.fromTo("#op-splash", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.4, ease: "expo.out" }, sp);
+      tl.fromTo("#op-fill", { scaleX: 0 }, { scaleX: 0.6, duration: Math.max(0.5, l2 - sp - 0.2), ease: "power1.inOut" }, sp + 0.2);
+      tl.fromTo("#op-pct", { innerText: 0 }, { innerText: 60, duration: Math.max(0.5, l2 - sp - 0.2), ease: "power1.inOut", snap: { innerText: 1 }, modifiers: { innerText: (v) => Math.round(v) + "%" } }, sp + 0.2);
+      tl.set("#op-t1", { opacity: 0 }, l2);
+      tl.set("#op-t2", { opacity: 1 }, l2);
+      tl.to("#op-fill", { scaleX: 1, duration: Math.max(0.4, exit - l2 - 0.3), ease: "power1.inOut" }, l2);
+      tl.fromTo("#op-pct", { innerText: 60 }, { innerText: 100, duration: Math.max(0.4, exit - l2 - 0.3), ease: "power1.inOut", snap: { innerText: 1 }, modifiers: { innerText: (v) => Math.round(v) + "%" }, immediateRender: false }, l2);
+
+      // Zoom through the splash into the app window.
+      tl.to(["#op-cap", "#op-rail"], { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power2.in" }, exit - 0.1);
+      tl.to("#op-splash", { scale: 1.22, opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power3.in", transformOrigin: "50% 50%" }, exit);
+      tl.to("#op-fx", { opacity: 0, duration: 0.3, ease: "power2.in" }, exit + 0.05);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["eg-open"] = tl;
+    })();
+  </script>
+</template>

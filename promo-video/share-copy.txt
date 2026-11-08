@@ -1,0 +1,7 @@
+English
+-------
+New ticket printer at your branch? Watch this 1-minute video. Open AMWAG Printer Setup, choose Yes when Windows asks, then print a test ticket. The app does the rest. If something looks wrong, click Repair or send the copied report to IT.
+
+العربية
+-------
+طابعة تذاكر جديدة في فرعك؟ شاهد هذا الفيديو (دقيقة واحدة). افتح AMWAG Printer Setup، واختر «نعم» عندما يطلب Windows الإذن، ثم اطبع تذكرة اختبار، والبرنامج يتولى الباقي. إذا ظهرت مشكلة، انقر «إصلاح» أو انسخ التقرير وأرسله إلى فريق تقنية المعلومات.

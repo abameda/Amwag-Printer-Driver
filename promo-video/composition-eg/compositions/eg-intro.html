@@ -1,0 +1,57 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "AmwagUI", sans-serif; color: #fff; direction: rtl; }
+    .in-ground { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%); }
+    .in-wave { position: absolute; left: -200px; bottom: -120px; width: 2400px; opacity: 0.07; }
+    #in-mark { position: absolute; left: 50%; top: 120px; width: 340px; margin-left: -170px; }
+    #in-title { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-size: 84px; font-weight: 700; color: #f5b642; direction: ltr; }
+    #in-sub { position: absolute; left: 0; right: 0; top: 412px; text-align: center; font-size: 40px; color: #c9d5e6; }
+    #in-list { position: absolute; left: 50%; top: 500px; width: 640px; margin-left: -320px; }
+    .in-row { position: relative; height: 78px; opacity: 0; }
+    .in-row .g { position: absolute; right: 0; top: 10px; width: 46px; height: 46px; border-radius: 50%; background: #2e7d32; }
+    .in-row .g svg { position: absolute; left: 11px; top: 11px; width: 24px; height: 24px; }
+    .in-row span { position: absolute; right: 70px; top: 10px; font-size: 40px; font-weight: 600; white-space: nowrap; }
+    .in-row i { position: absolute; right: 22px; top: 58px; width: 2px; height: 30px; background: rgba(255, 255, 255, 0.25); }
+  </style>
+  <div id="root" class="scene-in" data-composition-id="eg-intro" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"string","label":"Language","default":"ar"},{"id":"cues","type":"string","label":"Timing (generated)","default":"{}"}]'>
+    <div class="in-ground"></div>
+    <svg class="in-wave" id="in-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true"><path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path></svg>
+    <svg id="in-mark" viewBox="0 0 1728.07 502.27" role="img" aria-label="AMWAG">
+      <defs><clipPath id="in-swoosh-clip"><rect id="in-swoosh-rect" x="0" y="0" width="0" height="502.27"></rect></clipPath></defs>
+      <g clip-path="url(#in-swoosh-clip)"><path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path></g>
+      <g id="in-arc1"><path transform="matrix(1,0,0,-1,587.5479,311.9015)" d="M0 0C-423.43-137.993-616.243 140.331-584.107 311.902-555.752 98.295-272.208-25.019 0 0" fill="#F8B549"></path></g>
+      <g id="in-arc2"><path transform="matrix(1,0,0,-1,587.5479,283.54499)" d="M0 0C-137.993 3.781-293.776 47.635-381.843 151.225-332.797 15.698-128.541-30.417 0 0" fill="#F8B549"></path></g>
+      <g id="in-arc3"><path transform="matrix(1,0,0,-1,1177.3269,349.0633)" d="M0 0C92.33 79.741 368.211 99.688 482.025 28.275 361.047 48.504 160.674 56.55 0 0" fill="#F8B549"></path></g>
+    </svg>
+    <div id="in-title">AMWAG Printer Setup</div>
+    <div id="in-sub">إعداد طابعة التذاكر في فرعك</div>
+    <div id="in-list">
+      <div class="in-row" id="in-r1"><div class="g"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17 L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span>بيدوّر على الطابعة بنفسه</span><i></i></div>
+      <div class="in-row" id="in-r2"><div class="g"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17 L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span>بيسطّب الدرايفر المعتمد</span><i></i></div>
+      <div class="in-row" id="in-r3"><div class="g"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17 L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span>بيظبط مقاس ورقة التذكرة</span><i></i></div>
+      <div class="in-row" id="in-r4"><div class="g"><svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17 L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span>بيتأكد إن كل حاجة اتحفظت</span></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const C = JSON.parse(vars.cues || "{}");
+      const c = (n, f) => (C[n] !== undefined ? C[n] : f);
+      const tl = gsap.timeline({ paused: true });
+      const exit = c("exit", 14);
+      tl.fromTo("#in-wave", { x: 0 }, { x: -11 * (exit + 0.5), duration: exit + 0.5, ease: "none" }, 0);
+      tl.fromTo("#in-swoosh-rect", { attr: { width: 0 } }, { attr: { width: 1728 }, duration: 0.9, ease: "power2.inOut" }, 0.1);
+      tl.fromTo(["#in-arc1", "#in-arc2", "#in-arc3"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.6, ease: "expo.out", stagger: 0.08 }, 0.45);
+      tl.fromTo("#in-sub", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, c("subtitle", 1));
+      tl.fromTo("#in-title", { opacity: 0, filter: "blur(8px)", scale: 0.96 }, { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.35, ease: "expo.out" }, c("title", 3));
+      [1, 2, 3, 4].forEach((i) => tl.fromTo("#in-r" + i, { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, c("chip" + i, 4 + i)));
+      tl.to(["#in-mark", "#in-title", "#in-sub", "#in-list"], { scale: 1.06, opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power3.in" }, exit);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["eg-intro"] = tl;
+    })();
+  </script>
+</template>

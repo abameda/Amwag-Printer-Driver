@@ -1,0 +1,40 @@
+{
+  "$comment": "Voice settings for tts.py. 'voice' is the one the pipeline uses; the others were compared in out/samples (see QA-REPORT.md). Seeds keep regeneration reproducible.",
+  "voice": "habibi-egy",
+  "python": {
+    "habibi": "%USERPROFILE%/.amwag-video-tts/habibi/Scripts/python.exe",
+    "voicetut": "%USERPROFILE%/.amwag-video-tts/voicetut/Scripts/python.exe",
+    "asr": "%USERPROFILE%/.amwag-video-tts/asr/Scripts/python.exe"
+  },
+  "voices": {
+    "habibi-egy": {
+      "engine": "habibi",
+      "model": "Specialized",
+      "dialect": "EGY",
+      "ref_audio": "{habibi_assets}/EGY.mp3",
+      "ref_text": "ايه الكلام. بقولك ايه. استخدم صوتي في المحادثات. استخدمه هيعجبك اوي.",
+      "nfe_step": 32,
+      "cfg_strength": 2.0,
+      "sway_sampling_coef": -1.0,
+      "speed": 1.0,
+      "max_gap": 0.45,
+      "seed": 7
+    },
+    "habibi-unified-egy": {
+      "engine": "habibi",
+      "model": "Unified",
+      "dialect": "EGY",
+      "ref_audio": "{habibi_assets}/EGY.mp3",
+      "ref_text": "ايه الكلام. بقولك ايه. استخدم صوتي في المحادثات. استخدمه هيعجبك اوي.",
+      "nfe_step": 32,
+      "cfg_strength": 2.0,
+      "sway_sampling_coef": -1.0,
+      "speed": 1.0,
+      "seed": 7
+    },
+    "voicetut-mohammed": { "engine": "voicetut", "speaker": "Mohammed", "num_step": 32, "guidance_scale": 2.0, "speed": 1.0, "seed": 7 },
+    "voicetut-karim": { "engine": "voicetut", "speaker": "Karim", "num_step": 32, "guidance_scale": 2.0, "speed": 1.0, "seed": 7 },
+    "voicetut-youssef": { "engine": "voicetut", "speaker": "Youssef", "num_step": 32, "guidance_scale": 2.0, "speed": 1.0, "seed": 7 },
+    "voicetut-ahmed": { "engine": "voicetut", "speaker": "Ahmed", "num_step": 32, "guidance_scale": 2.0, "speed": 1.0, "seed": 7 }
+  }
+}

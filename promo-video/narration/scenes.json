@@ -1,0 +1,414 @@
+{
+  "$comment": "Scene metadata for the narrated tutorial: what each narration line teaches and shows. build.mjs combines it with script.json and the measured audio into storyboard.md; beats.mjs turns it into exact animation times. 'section' entries set the step caption beside the app window from that line on.",
+  "importance": {
+    "C": "critical",
+    "I": "important",
+    "S": "simple",
+    "O": "optional"
+  },
+  "lines": {
+    "intro.1": {
+      "imp": "I",
+      "goal": "Know what this video teaches and the app's name",
+      "focus": "AMWAG logo draws, then the app name",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "intro.2": {
+      "imp": "I",
+      "goal": "Understand the four things the app does by itself",
+      "focus": "Four step chips appear as each job is spoken: find printer, driver, ticket size, verify",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "intro.3": {
+      "imp": "S",
+      "goal": "Feel that the employee's part is small",
+      "focus": "Chips settle; scene zooms through",
+      "cursor": "-",
+      "zoom": "zoom-through transition"
+    },
+    "open.1": {
+      "imp": "C",
+      "goal": "Start the app from the folder IT provides",
+      "focus": "File window of the distribution folder; AMWAG Printer Setup.exe",
+      "cursor": "glides to the exe, double-clicks on 'دبل كليك'",
+      "zoom": "punch-in on the exe row"
+    },
+    "open.2": {
+      "imp": "S",
+      "goal": "Expect a short loading screen",
+      "focus": "Startup splash loads to 100%",
+      "cursor": "hidden",
+      "zoom": "splash zooms into the app window"
+    },
+    "steps.0": {
+      "imp": "S",
+      "goal": "Know the language follows Windows and can be switched",
+      "focus": "Language button in the header",
+      "cursor": "-",
+      "zoom": "spotlight on the language button"
+    },
+    "steps.1": {
+      "imp": "I",
+      "goal": "Read progress from the six-step list",
+      "focus": "Step list; first step running",
+      "cursor": "-",
+      "zoom": "spotlight on the step list"
+    },
+    "steps.2": {
+      "imp": "I",
+      "goal": "Know USB and network printers are both found",
+      "focus": "Detecting printer ticks; printer card fills row by row",
+      "cursor": "-",
+      "zoom": "spotlight on the printer card"
+    },
+    "steps.3": {
+      "imp": "I",
+      "goal": "Understand the driver is checked and installed only if needed",
+      "focus": "Checking driver ticks; Installing driver with integrity check text",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "steps.4": {
+      "imp": "I",
+      "goal": "Wait without intervening",
+      "focus": "Installing driver keeps running",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "steps.5": {
+      "imp": "C",
+      "goal": "Do not close the window during setup",
+      "focus": "Window close button marked with a warning",
+      "cursor": "-",
+      "zoom": "spotlight on the close button"
+    },
+    "uac.1": {
+      "imp": "C",
+      "goal": "Recognise the app's warning before Windows asks",
+      "focus": "Blue permission notice",
+      "cursor": "-",
+      "zoom": "punch-in on the notice"
+    },
+    "uac.2": {
+      "imp": "C",
+      "goal": "Choose Yes in the Windows permission prompt",
+      "focus": "Windows permission prompt",
+      "cursor": "moves to Yes, clicks on 'نعم'",
+      "zoom": "spotlight on Yes"
+    },
+    "uac.3": {
+      "imp": "I",
+      "goal": "Know the prompt appears once, and only when needed",
+      "focus": "Prompt closes; install continues",
+      "cursor": "hidden",
+      "zoom": "-"
+    },
+    "ready.1": {
+      "imp": "I",
+      "goal": "Understand the ticket defaults the app sets",
+      "focus": "Driver installed ticks; Configuring ticket size; ticket size row highlighted; four defaults listed",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "ready.2": {
+      "imp": "I",
+      "goal": "Know the app double-checks its work",
+      "focus": "Verification runs and ticks",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "ready.3": {
+      "imp": "C",
+      "goal": "Recognise success: six green steps and 'Ready to print tickets'",
+      "focus": "Ready ticks; result screen with green check",
+      "cursor": "-",
+      "zoom": "punch-in on the result title"
+    },
+    "ready.4": {
+      "imp": "S",
+      "goal": "Find the printer summary",
+      "focus": "Summary card",
+      "cursor": "-",
+      "zoom": "spotlight on the summary"
+    },
+    "test.1": {
+      "imp": "C",
+      "goal": "Start the test ticket",
+      "focus": "Print Test Ticket button",
+      "cursor": "moves to the button, clicks after its name",
+      "zoom": "spotlight on the button"
+    },
+    "test.2": {
+      "imp": "C",
+      "goal": "Load ticket paper in the multipurpose tray and print",
+      "focus": "Test print screen",
+      "cursor": "moves to Print, clicks on 'طباعة'",
+      "zoom": "spotlight on Print"
+    },
+    "test.3": {
+      "imp": "S",
+      "goal": "See the print status",
+      "focus": "Sending, then Printing; ticket feeds out beside the window",
+      "cursor": "hidden",
+      "zoom": "-"
+    },
+    "test.4": {
+      "imp": "C",
+      "goal": "Check the four corner marks",
+      "focus": "Corner marks light up on the ticket; first check ticks",
+      "cursor": "-",
+      "zoom": "punch-in on the checklist"
+    },
+    "test.5": {
+      "imp": "C",
+      "goal": "Check both 50 mm bars",
+      "focus": "Bars light up; second check ticks",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "test.6": {
+      "imp": "C",
+      "goal": "Check text is upright, nothing cut off, and the tray",
+      "focus": "TOP arrow and ticket edge light up; checks three and four tick",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "test.7": {
+      "imp": "C",
+      "goal": "Confirm a correct test ticket",
+      "focus": "Printed correctly button",
+      "cursor": "clicks 'Printed correctly'",
+      "zoom": "spotlight on the button"
+    },
+    "soft.1": {
+      "imp": "O",
+      "goal": "Start the optional ticket software check",
+      "focus": "Check ticket software link, then waiting for a print job",
+      "cursor": "clicks the link on 'دوس'",
+      "zoom": "spotlight on the link"
+    },
+    "soft.2": {
+      "imp": "O",
+      "goal": "Understand the check only reads and compares",
+      "focus": "Result banner and comparison table rows",
+      "cursor": "-",
+      "zoom": "punch-in on the table"
+    },
+    "soft.3": {
+      "imp": "O",
+      "goal": "Know what to do with a difference",
+      "focus": "All rows 'Matches'",
+      "cursor": "-",
+      "zoom": "pull back"
+    },
+    "cases.1": {
+      "imp": "I",
+      "goal": "Enter the 'situations you may meet' part",
+      "focus": "Section caption; window resets to detection",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "cases.2": {
+      "imp": "I",
+      "goal": "Choose the ticket printer when several are found",
+      "focus": "Choose the ticket printer screen with two printers",
+      "cursor": "selects the USB ticket printer, clicks Continue",
+      "zoom": "spotlight on the cards, then Continue"
+    },
+    "cases.3": {
+      "imp": "I",
+      "goal": "Enter a network printer's address",
+      "focus": "Network address screen; address typed",
+      "cursor": "clicks the field, types the address, clicks Find printer",
+      "zoom": "spotlight on the field"
+    },
+    "cases.4": {
+      "imp": "I",
+      "goal": "Confirm the model only if the label matches",
+      "focus": "Is this the right printer? screen beside a printer label",
+      "cursor": "clicks Yes at the end",
+      "zoom": "spotlight on the model text"
+    },
+    "cases.5": {
+      "imp": "C",
+      "goal": "Recover from choosing No",
+      "focus": "Permission was not given result; Try again",
+      "cursor": "clicks Try again on 'حاول'",
+      "zoom": "spotlight on Try again"
+    },
+    "cases.6": {
+      "imp": "I",
+      "goal": "Know when IT must approve",
+      "focus": "Windows prompt asking for an administrator user name and password",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "fix.1": {
+      "imp": "I",
+      "goal": "Report a bad test ticket and follow the guidance",
+      "focus": "There is a problem, then the guidance list",
+      "cursor": "clicks There is a problem",
+      "zoom": "spotlight on the guidance list"
+    },
+    "fix.2": {
+      "imp": "I",
+      "goal": "Read printer problems during the test print",
+      "focus": "Printer reported a problem: out of paper",
+      "cursor": "-",
+      "zoom": "spotlight on the problem banner"
+    },
+    "fix.3": {
+      "imp": "C",
+      "goal": "Use Repair or Try again when not ready",
+      "focus": "The printer is not ready result; Repair",
+      "cursor": "-",
+      "zoom": "spotlight on Repair"
+    },
+    "fix.4": {
+      "imp": "C",
+      "goal": "Send the report to IT",
+      "focus": "Copy report, then 'Report copied'",
+      "cursor": "clicks Copy report on 'نسخ'",
+      "zoom": "spotlight on Copy report"
+    },
+    "outro.1": {
+      "imp": "I",
+      "goal": "Remember the four employee actions",
+      "focus": "Recap list builds item by item",
+      "cursor": "-",
+      "zoom": "-"
+    },
+    "outro.2": {
+      "imp": "S",
+      "goal": "Know where to get help",
+      "focus": "AMWAG IT Department line; silent on-screen developer credit",
+      "cursor": "-",
+      "zoom": "-"
+    }
+  },
+  "sections": [
+    {
+      "from": "open.1",
+      "scene": "open",
+      "label": "الخطوة 1 من 6",
+      "title": "افتح *البرنامج*",
+      "help": "دبل كليك على AMWAG Printer Setup.exe"
+    },
+    {
+      "from": "steps.0",
+      "scene": "tutorial",
+      "label": "الخطوة 2 من 6",
+      "title": "سيبه *يشتغل لوحده*",
+      "help": "بيدوّر على الطابعة ويسطّب الدرايفر المعتمد"
+    },
+    {
+      "from": "uac.1",
+      "scene": "tutorial",
+      "label": "الخطوة 3 من 6",
+      "title": "لما ويندوز يطلب الإذن، اختار *«نعم»*",
+      "help": "الإذن بيتطلب مرة واحدة بس"
+    },
+    {
+      "from": "ready.1",
+      "scene": "tutorial",
+      "label": "الخطوة 4 من 6",
+      "title": "استنى *«جاهزة لطباعة التذاكر»*",
+      "help": "الست خطوات كلها أخضر = الطابعة اتظبطت"
+    },
+    {
+      "from": "test.1",
+      "scene": "tutorial",
+      "label": "الخطوة 5 من 6",
+      "title": "اطبع *تذكرة اختبار*",
+      "help": "ورق التذاكر في الدرج متعدد الأغراض"
+    },
+    {
+      "from": "test.3",
+      "scene": "tutorial",
+      "label": "الخطوة 5 من 6",
+      "title": "افحص *التذكرة المطبوعة*",
+      "help": "",
+      "ticket": true
+    },
+    {
+      "from": "soft.1",
+      "scene": "tutorial",
+      "label": "الخطوة 6 من 6 · اختيارية",
+      "title": "افحص *برنامج التذاكر*",
+      "help": "البرنامج بيقرا ويقارن، من غير ما يغيّر حاجة"
+    },
+    {
+      "from": "cases.1",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "لو البرنامج *سألك*",
+      "help": ""
+    },
+    {
+      "from": "cases.2",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "اختار *طابعة التذاكر*",
+      "help": "الطابعة اللي الجهاز ده بيطبع عليها التذاكر"
+    },
+    {
+      "from": "cases.3",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "اكتب *عنوان الطابعة*",
+      "help": "موجود في صفحة حالة الطابعة"
+    },
+    {
+      "from": "cases.4",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "بص على *ملصق الطابعة*",
+      "help": "اختار «نعم» بس لو الموديل مطابق",
+      "label_card": true
+    },
+    {
+      "from": "cases.5",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "اخترت «لا»؟ دوس *«حاول مرة أخرى»*",
+      "help": "مفيش حاجة اتغيرت"
+    },
+    {
+      "from": "cases.6",
+      "scene": "tutorial",
+      "label": "مواقف ممكن تقابلك",
+      "title": "طلب باسورد أدمن؟ *كلّم الـ IT*",
+      "help": ""
+    },
+    {
+      "from": "fix.1",
+      "scene": "tutorial",
+      "label": "لو فيه مشكلة",
+      "title": "تذكرة الاختبار مش مظبوطة؟ دوس *«توجد مشكلة»*",
+      "help": "واتبع الخطوات اللي البرنامج بيعرضها"
+    },
+    {
+      "from": "fix.2",
+      "scene": "tutorial",
+      "label": "لو فيه مشكلة",
+      "title": "مشكلة في *الطابعة نفسها*",
+      "help": "البرنامج بيقولك تعمل إيه"
+    },
+    {
+      "from": "fix.3",
+      "scene": "tutorial",
+      "label": "لو فيه مشكلة",
+      "title": "مش جاهزة؟ دوس *«إصلاح»*",
+      "help": "أو «حاول مرة أخرى»"
+    },
+    {
+      "from": "fix.4",
+      "scene": "tutorial",
+      "label": "لو فيه مشكلة",
+      "title": "ابعت *التقرير* للـ IT",
+      "help": "«نسخ التقرير» وابعته لإدارة تكنولوجيا المعلومات"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+bin/
+obj/
+dist/
+artifacts/
+TestResults/
+*.user
+.vs/
+
+# Approved offline driver archives are large vendor binaries; keep them in the distribution share, not in source control.
+drivers/*
+!drivers/README.md
+
+graphify-out/
+
+# Local agent/tooling settings (machine-specific paths)
+.claude/
+.codex/
+
+# Video project caches and raw audio sources (large, regenerable)
+node_modules/
+.hyperframes/
+renders/
+*.wav
+__pycache__/
+promo-video/narration/out/
+promo-video/deliverables/voice-samples/

@@ -1,0 +1,124 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: "AmwagUI", sans-serif;
+      color: #ffffff;
+    }
+    .intro-ground {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%);
+    }
+    .intro-wave {
+      position: absolute;
+      left: -200px;
+      bottom: -120px;
+      width: 2400px;
+      opacity: 0.07;
+    }
+    .intro-mark {
+      position: absolute;
+      left: 50%;
+      top: 300px;
+      width: 420px;
+      margin-left: -210px;
+    }
+    .intro-line {
+      position: absolute;
+      left: 160px;
+      right: 160px;
+      text-align: center;
+      line-height: 1.15;
+    }
+    #intro-l1 { top: 520px; font-size: 80px; font-weight: 600; letter-spacing: -0.01em; }
+    #intro-l2a { top: 500px; font-size: 92px; font-weight: 700; color: #f5b642; }
+    #intro-l2b { top: 630px; font-size: 48px; font-weight: 400; color: #c9d5e6; }
+    .w { display: inline-block; white-space: pre; }
+  </style>
+  <div id="root" class="scene-intro" data-composition-id="intro" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"enum","label":"Language","default":"en","options":[{"value":"en","label":"English"},{"value":"ar","label":"Arabic"}]}]'>
+    <div class="intro-ground"></div>
+    <svg class="intro-wave" id="intro-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true">
+      <path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path>
+    </svg>
+    <svg class="intro-mark" id="intro-mark" viewBox="0 0 1728.07 502.27" role="img" aria-label="AMWAG">
+      <defs>
+        <clipPath id="intro-swoosh-clip"><rect id="intro-swoosh-rect" x="0" y="0" width="0" height="502.27"></rect></clipPath>
+      </defs>
+      <g clip-path="url(#intro-swoosh-clip)"><path id="intro-swoosh" transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path></g>
+      <g id="intro-arc1"><path transform="matrix(1,0,0,-1,587.5479,311.9015)" d="M0 0C-423.43-137.993-616.243 140.331-584.107 311.902-555.752 98.295-272.208-25.019 0 0" fill="#F8B549"></path></g>
+      <g id="intro-arc2"><path transform="matrix(1,0,0,-1,587.5479,283.54499)" d="M0 0C-137.993 3.781-293.776 47.635-381.843 151.225-332.797 15.698-128.541-30.417 0 0" fill="#F8B549"></path></g>
+      <g id="intro-arc3"><path transform="matrix(1,0,0,-1,1177.3269,349.0633)" d="M0 0C92.33 79.741 368.211 99.688 482.025 28.275 361.047 48.504 160.674 56.55 0 0" fill="#F8B549"></path></g>
+    </svg>
+    <div class="intro-line" id="intro-l1" data-en="New ticket printer at your branch?" data-ar="طابعة تذاكر جديدة في فرعك؟"></div>
+    <div class="intro-line" id="intro-l2a" data-en="AMWAG Printer Setup" data-ar="AMWAG Printer Setup"></div>
+    <div class="intro-line" id="intro-l2b" data-en="sets up the ticket printer for your branch." data-ar="يُعِدّ طابعة التذاكر في فرعك تلقائيًا."></div>
+  </div>
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const AR = vars.lang === "ar";
+      const root = document.querySelector(".scene-intro");
+      root.setAttribute("dir", AR ? "rtl" : "ltr");
+      root.setAttribute("lang", AR ? "ar" : "en");
+      root.querySelectorAll("[data-en]").forEach((el) => { el.textContent = AR ? el.dataset.ar : el.dataset.en; });
+      // Split the lines into words so they can arrive one by one.
+      function words(el) {
+        // One span per word; in Arabic a run of Latin words (a product name) stays one left-to-right span.
+        const groups = [];
+        Array.from(el.childNodes).forEach((node) => {
+          const hl = node.nodeType === 1;
+          node.textContent.split(" ").filter(Boolean).forEach((t) => {
+            const latin = /[A-Za-z]/.test(t) && !/[؀-ۿ]/.test(t);
+            const last = groups[groups.length - 1];
+            if (AR && latin && last && last.latin && last.hl === hl) last.text += " " + t;
+            else groups.push({ text: t, latin: latin, hl: hl });
+          });
+        });
+        el.textContent = "";
+        return groups.map((g, i) => {
+          const s = document.createElement("span");
+          s.className = "w" + (g.hl ? " hl" : "");
+          if (AR && g.latin) s.setAttribute("dir", "ltr");
+          s.textContent = g.text;
+          el.appendChild(s);
+          // The space sits between pieces, so it lands on the correct side in both directions.
+          if (i < groups.length - 1) el.appendChild(document.createTextNode(" "));
+          return s;
+        });
+      }
+      const l1 = words(document.getElementById("intro-l1"));
+      const l2a = words(document.getElementById("intro-l2a"));
+
+      const tl = gsap.timeline({ paused: true });
+      // Background swoosh drifts at a constant speed through the whole film (continuous with later scenes).
+      tl.fromTo("#intro-wave", { x: 0 }, { x: -64, duration: 6.4, ease: "none" }, 0);
+
+      // The AMWAG mark draws itself: swoosh wipes in, then the three amber arcs land.
+      tl.fromTo("#intro-swoosh-rect", { attr: { width: 0 } }, { attr: { width: 1728 }, duration: 0.9, ease: "power2.inOut" }, 0.1);
+      tl.fromTo(["#intro-arc1", "#intro-arc2", "#intro-arc3"],
+        { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" },
+        { opacity: 1, scale: 1, duration: 0.6, ease: "expo.out", stagger: 0.08 }, 0.45);
+
+      // Line 1 arrives word by word, holds, then blurs out.
+      tl.fromTo(l1, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, ease: "power2.out", stagger: 0.067 }, 0.55);
+      tl.to("#intro-l1", { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power2.in" }, 3.15);
+
+      // Line 2: the app's name in amber, then its own subtitle.
+      tl.fromTo(l2a, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out", stagger: 0.09 }, 3.45);
+      tl.fromTo("#intro-l2b", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 3.8);
+
+      // Zoom through into the next scene.
+      tl.to(["#intro-mark", "#intro-l2a", "#intro-l2b"], { scale: 1.08, opacity: 0, filter: "blur(10px)", duration: 0.32, ease: "power3.in" }, 6.05);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["intro"] = tl;
+    })();
+  </script>
+</template>

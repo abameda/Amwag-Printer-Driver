@@ -1,0 +1,732 @@
+<template>
+  <style>
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI"), local("SegoeUI"); font-weight: 400; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Semibold"), local("SegoeUI-Semibold"); font-weight: 600; }
+    @font-face { font-family: "AmwagUI"; src: local("Segoe UI Bold"), local("SegoeUI-Bold"); font-weight: 700; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "AmwagUI", sans-serif; color: #fff; }
+    .app-ground { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1b416d 0%, #0f2a4a 55%, #0b2038 100%); }
+    .app-wave { position: absolute; left: -200px; bottom: -120px; width: 2400px; opacity: 0.07; }
+    bdi { unicode-bidi: isolate; }
+
+    /* ---------- Step captions ---------- */
+    .rail { position: absolute; inset-inline-start: 120px; top: 352px; display: flex; gap: 8px; }
+    .rail i { display: block; width: 64px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); }
+    .cap { position: absolute; inset-inline-start: 120px; top: 300px; width: 540px; opacity: 0; }
+    .cap-label { font-size: 22px; font-weight: 600; letter-spacing: 0.12em; color: #c9d5e6; text-transform: uppercase; }
+    #root[lang="ar"] .cap-label { letter-spacing: 0; font-size: 26px; }
+    .cap-title { margin-top: 70px; font-size: 58px; font-weight: 600; line-height: 1.14; }
+    .cap-help { margin-top: 26px; font-size: 30px; line-height: 1.4; color: #c9d5e6; }
+    .hl { color: #f5b642; }
+    .w { display: inline-block; white-space: pre; }
+    /* Compact caption above the printed ticket */
+    .cap-top { top: 112px; }
+    .cap-top .cap-title { margin-top: 14px; font-size: 48px; }
+
+    /* ---------- The printed test ticket ---------- */
+    .tk-slot { position: absolute; inset-inline-start: 108px; top: 262px; width: 380px; height: 22px; border-radius: 11px; background: #071629; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35); opacity: 0; }
+    .tk-clip { position: absolute; inset-inline-start: 140px; top: 273px; width: 316px; height: 690px; overflow: hidden; }
+    .tk { position: absolute; left: 0; top: 0; width: 316px; height: 647px; opacity: 0; background: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4); }
+    .tk svg { position: absolute; inset: 0; width: 316px; height: 647px; }
+    .tk-labels { position: absolute; inset-inline-start: 484px; top: 420px; width: 200px; }
+    .tk-l { position: relative; height: 92px; font-size: 23px; font-weight: 600; line-height: 1.2; padding-inline-start: 40px; opacity: 0; }
+    .tk-l svg { position: absolute; inset-inline-start: 0; top: 2px; width: 28px; height: 28px; }
+
+    /* ---------- The app window (840 x 668 logical px, shown at 1.3x) ---------- */
+    .app-view { position: absolute; top: 106px; width: 1092px; height: 868px; inset-inline-end: 96px; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06); background: #fff; }
+    .app-cam { position: absolute; left: 0; top: 0; width: 840px; height: 668px; transform-origin: 0 0; }
+    .win { position: absolute; inset: 0; background: #fff; color: #15191d; font-size: 13.33px; }
+    .tb { position: absolute; top: 0; inset-inline: 0; height: 32px; background: #ffffff; border-bottom: 1px solid #e8ecef; }
+    .tb img { position: absolute; inset-inline-start: 10px; top: 8px; width: 16px; height: 16px; border-radius: 3px; }
+    .tb-title { position: absolute; inset-inline-start: 34px; top: 8px; font-size: 12px; }
+    .tb-ctl { position: absolute; inset-inline-end: 0; top: 0; display: flex; }
+    .tb-ctl span { display: block; width: 46px; height: 32px; text-align: center; line-height: 32px; font-size: 12px; }
+    .hd { position: absolute; top: 32px; inset-inline: 0; height: 85px; background: #0f2a4a; color: #fff; }
+    .hd img { position: absolute; inset-inline-start: 24px; top: 27px; width: 104px; }
+    .hd-title { position: absolute; inset-inline-start: 146px; top: 14px; font-size: 20px; font-weight: 600; white-space: nowrap; }
+    .hd-sub { position: absolute; inset-inline-start: 146px; top: 49px; font-size: 13px; color: #c9d5e6; white-space: nowrap; }
+    .hd-lang { position: absolute; inset-inline-end: 24px; top: 22px; width: 88px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 4px; text-align: center; line-height: 38px; font-size: 13px; }
+    .bd { position: absolute; top: 117px; inset-inline: 0; height: 515px; }
+    .steps { position: absolute; inset-inline-start: 0; top: 0; width: 248px; height: 515px; background: #f2f4f5; }
+    .content { position: absolute; inset-inline-start: 248px; top: 0; width: 592px; height: 515px; background: #fff; }
+    .ft { position: absolute; top: 632px; inset-inline: 0; height: 36px; background: #f2f4f5; border-top: 1px solid #dce1e5; font-size: 12px; color: #56616b; }
+    .ft span { position: absolute; top: 9px; white-space: nowrap; }
+
+    /* Step list (UI/StepList.cs) */
+    .st { position: absolute; inset-inline-start: 0; width: 248px; height: 56px; }
+    .st-g { position: absolute; inset-inline-start: 20px; top: 12px; width: 22px; height: 22px; border-radius: 50%; }
+    .g-wait { border: 2px solid #7b8792; background: #fff; }
+    .g-run { border: 3px solid #dce1e5; border-top-color: #0f2a4a; opacity: 0; }
+    .g-done { background: #2e7d32; opacity: 0; }
+    .g-done svg { position: absolute; left: 4px; top: 4px; width: 14px; height: 14px; }
+    .st-t { position: absolute; inset-inline-start: 57px; top: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-s { position: absolute; inset-inline-start: 57px; top: 27px; font-size: 11.67px; white-space: nowrap; max-width: 182px; overflow: hidden; text-overflow: ellipsis; }
+    .s-wait { color: #56616b; }
+    .s-run { color: #15191d; opacity: 0; }
+    .s-done { color: #2e7d32; opacity: 0; }
+    .st-line { position: absolute; inset-inline-start: 30px; width: 2px; height: 32px; background: #dce1e5; }
+    .st-line i { position: absolute; inset: 0; background: #0f2a4a; opacity: 0; }
+
+    /* Views */
+    .view { position: absolute; inset: 0; opacity: 0; }
+    .vin { position: absolute; inset-inline-start: 35px; top: 0; width: 528px; height: 515px; }
+    .vin > * { position: absolute; inset-inline-start: 0; }
+    .v-h { top: 26px; font-size: 19px; font-weight: 600; white-space: nowrap; }
+    .v-p { top: 62px; width: 528px; color: #56616b; line-height: 1.4; }
+    .v-strong { color: #15191d; font-weight: 600; }
+    .ring { position: absolute; width: 34px; height: 34px; border-radius: 50%; border: 4px solid #e3eaf2; border-top-color: #0f2a4a; }
+    .run-row { width: 528px; height: 34px; }
+    .run-row .ring { inset-inline-start: 0; top: 0; }
+    .run-t { position: absolute; inset-inline-start: 50px; top: 7px; font-weight: 600; white-space: nowrap; opacity: 0; }
+    .detail { width: 528px; height: 18px; font-size: 12px; color: #56616b; }
+    .detail span { position: absolute; inset-inline-start: 0; top: 0; white-space: nowrap; opacity: 0; }
+    .notice { top: 200px; width: 528px; height: 64px; background: #e3eaf2; border-radius: 6px; border-inline-start: 4px solid #0f2a4a; opacity: 0; }
+    .notice svg { position: absolute; inset-inline-start: 14px; top: 13px; width: 20px; height: 22px; }
+    .notice div { position: absolute; inset-inline-start: 48px; top: 11px; width: 460px; line-height: 1.4; }
+    .card { width: 528px; border: 1px solid #dce1e5; border-radius: 8px; background: #fff; }
+    .card-t { position: absolute; inset-inline-start: 16px; top: 14px; font-size: 12px; font-weight: 600; color: #56616b; }
+    .row { position: absolute; inset-inline-start: 0; width: 526px; height: 28px; font-size: 12.5px; }
+    .row b { position: absolute; inset-inline-start: 16px; top: 5px; font-weight: 400; color: #56616b; white-space: nowrap; }
+    .row span { position: absolute; inset-inline-start: 112px; top: 5px; white-space: nowrap; }
+    .row-hl { position: absolute; inset-inline: 6px; top: 0; height: 28px; border-radius: 4px; background: #fff4df; opacity: 0; }
+    .btn { height: 40px; border-radius: 4px; text-align: center; line-height: 38px; font-size: 13.33px; white-space: nowrap; }
+    .btn-a { background: #f5b642; border: 1px solid #f5b642; color: #15191d; font-weight: 600; }
+    .btn-o { background: #fff; border: 1px solid #7b8792; color: #15191d; }
+    .btn-press { position: absolute; inset: -1px; border-radius: 4px; background: #d69422; opacity: 0; }
+    .btn-hover { position: absolute; inset: -1px; border-radius: 4px; background: #e8a52e; opacity: 0; }
+    .btn label { position: relative; }
+    .lnk { font-size: 13.33px; white-space: nowrap; }
+    .res-ico { top: 22px; width: 36px; height: 36px; border-radius: 50%; background: #2e7d32; }
+    .res-ico svg { position: absolute; left: 8px; top: 8px; width: 20px; height: 20px; }
+    .res-t { inset-inline-start: 52px !important; top: 20px; font-size: 19px; font-weight: 600; color: #2e7d32; white-space: nowrap; }
+    .res-p { inset-inline-start: 52px !important; top: 48px; color: #56616b; white-space: nowrap; }
+    .chk { width: 528px; height: 24px; }
+    .chk i { position: absolute; inset-inline-start: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #56616b; background: #fff; }
+    .chk em { position: absolute; inset-inline-start: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; background: #0f2a4a; opacity: 0; }
+    .chk em svg { position: absolute; left: 4px; top: 4px; width: 10px; height: 10px; }
+    .chk span { position: absolute; inset-inline-start: 28px; top: 0; white-space: nowrap; }
+    .banner { top: 96px; width: 528px; height: 70px; background: #e8f4ea; border-radius: 6px; border-inline-start: 4px solid #2e7d32; opacity: 0; }
+    .banner .res-ico { position: absolute; inset-inline-start: 14px; top: 14px; width: 22px; height: 22px; }
+    .banner .res-ico svg { left: 5px; top: 5px; width: 12px; height: 12px; }
+    .banner b { position: absolute; inset-inline-start: 48px; top: 11px; font-weight: 600; white-space: nowrap; }
+    .banner span { position: absolute; inset-inline-start: 48px; top: 34px; width: 460px; font-size: 12.5px; line-height: 1.35; }
+    .tbl { top: 182px; width: 528px; height: 222px; border: 1px solid #dce1e5; border-radius: 8px; opacity: 0; }
+    .tbl-h { position: absolute; inset-inline-start: 0; top: 8px; width: 526px; height: 30px; font-size: 12px; color: #56616b; }
+    .tbl-h span, .tr span { position: absolute; top: 0; }
+    .tr { position: absolute; inset-inline-start: 0; width: 526px; height: 44px; opacity: 0; }
+    .c1 { inset-inline-start: 40px; }
+    .c2 { inset-inline-start: 222px; width: 150px; line-height: 1.25; }
+    .c3 { inset-inline-start: 382px; width: 140px; line-height: 1.25; }
+    .tr .ok { position: absolute; inset-inline-start: 12px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: #2e7d32; }
+    .tr .ok svg { position: absolute; left: 4px; top: 4px; width: 10px; height: 10px; }
+    .tr .c1 { font-weight: 600; }
+    .tr small { position: absolute; inset-inline-start: 40px; top: 20px; font-size: 11.5px; color: #2e7d32; }
+
+    /* Windows permission prompt (illustrative) */
+    .shade { position: absolute; inset: 0; background: rgba(8, 18, 32, 0.55); opacity: 0; }
+    .dlg { position: absolute; inset-inline-start: 190px; top: 214px; width: 460px; height: 240px; background: #ffffff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); color: #15191d; overflow: hidden; opacity: 0; }
+    .dlg-h { position: absolute; inset-inline-start: 24px; top: 16px; font-size: 12px; color: #56616b; }
+    .dlg-q { position: absolute; inset-inline-start: 24px; top: 42px; width: 412px; font-size: 18px; font-weight: 600; line-height: 1.3; }
+    .dlg-app { position: absolute; inset-inline-start: 24px; top: 112px; height: 34px; }
+    .dlg-app img { position: absolute; inset-inline-start: 0; top: 0; width: 32px; height: 32px; border-radius: 6px; }
+    .dlg-app span { position: absolute; inset-inline-start: 44px; top: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .dlg-f { position: absolute; inset-inline: 0; top: 174px; height: 66px; background: #f3f3f3; border-top: 1px solid #e5e5e5; }
+    .dlg-b { position: absolute; top: 16px; width: 202px; height: 34px; border-radius: 4px; text-align: center; line-height: 32px; font-size: 13.33px; }
+    .dlg-yes { inset-inline-start: 24px; background: #0067c0; border: 1px solid #0067c0; color: #fff; }
+    .dlg-no { inset-inline-start: 234px; background: #fbfbfb; border: 1px solid #d1d1d1; }
+    .dlg-yes i { position: absolute; inset: -1px; border-radius: 4px; background: #003e73; opacity: 0; }
+    .dlg-yes label { position: relative; }
+    .cursor { position: absolute; left: 0; top: 0; width: 24px; height: 36px; opacity: 0; }
+    /* Click spotlight: dims the window except a feathered ellipse on the next thing to click
+       (yt-feather-highlight from the HyperFrames registry). */
+    .spot {
+      --sx: 50%; --sy: 50%; --srx: 16%; --sry: 8%;
+      position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: rgba(6, 16, 30, 0.5);
+      -webkit-mask-image: radial-gradient(ellipse var(--srx) var(--sry) at var(--sx) var(--sy), transparent 0%, transparent 55%, black 92%);
+      mask-image: radial-gradient(ellipse var(--srx) var(--sry) at var(--sx) var(--sy), transparent 0%, transparent 55%, black 92%);
+    }
+  </style>
+  <div id="root" class="scene-app" data-composition-id="app" data-width="1920" data-height="1080"
+       data-composition-variables='[{"id":"lang","type":"enum","label":"Language","default":"en","options":[{"value":"en","label":"English"},{"value":"ar","label":"Arabic"}]}]'>
+    <div class="app-ground" data-layout-allow-occlusion></div>
+    <svg class="app-wave" id="app-wave" viewBox="0 0 1728.07 502.27" aria-hidden="true">
+      <path transform="matrix(1,0,0,-1,45.8969,294.987)" d="M0 0C594.117-574.038 1039.332 253.694 1682.178 0 1026.793 407.325 565.897-354.563 0 0" fill="#34AAE1"></path>
+    </svg>
+
+    <!-- Captions, one per step -->
+    <div class="rail" id="app-rail"><i id="app-r1"></i><i id="app-r2"></i><i id="app-r3"></i><i id="app-r4"></i><i id="app-r5"></i><i id="app-r6"></i></div>
+    <div class="cap" id="app-cap2">
+      <div class="cap-label" data-en="Step 2 of 6" data-ar="الخطوة 2 من 6"></div>
+      <div class="cap-title" data-en="Just wait. It works *by itself*" data-ar="انتظر قليلًا، فهو يعمل *تلقائيًا*"></div>
+      <div class="cap-help" data-en="It finds your printer (USB or network) and installs the approved driver." data-ar="يعثر على طابعتك (USB أو الشبكة) ويثبّت برنامج التشغيل المعتمد."></div>
+    </div>
+    <div class="cap" id="app-cap3">
+      <div class="cap-label" data-en="Step 3 of 6" data-ar="الخطوة 3 من 6"></div>
+      <div class="cap-title" data-en="When Windows asks, choose *Yes*" data-ar="عندما يطلب Windows الإذن، اختر *«نعم»*"></div>
+      <div class="cap-help" data-en="Windows asks once, to install the driver and create the ticket paper size." data-ar="يُطلب الإذن مرة واحدة لتثبيت برنامج التشغيل وإنشاء حجم ورق التذكرة."></div>
+    </div>
+    <div class="cap" id="app-cap4">
+      <div class="cap-label" data-en="Step 4 of 6" data-ar="الخطوة 4 من 6"></div>
+      <div class="cap-title" data-en="Wait for *Ready to print tickets*" data-ar="انتظر حتى تظهر *«جاهزة لطباعة التذاكر»*"></div>
+      <div class="cap-help" data-en="It sets the ticket size and tray, then checks every setting." data-ar="يضبط حجم التذكرة والدرج، ثم يتحقق من كل إعداد."></div>
+    </div>
+    <div class="cap" id="app-cap5">
+      <div class="cap-label" data-en="Step 5 of 6" data-ar="الخطوة 5 من 6"></div>
+      <div class="cap-title" data-en="Print a *test ticket*" data-ar="اطبع *تذكرة اختبار*"></div>
+      <div class="cap-help" data-en="Load ticket paper into the multipurpose tray, then click Print." data-ar="ضع ورق التذاكر في الدرج متعدد الأغراض، ثم انقر «طباعة»."></div>
+    </div>
+    <div class="cap cap-top" id="app-cap5b">
+      <div class="cap-label" data-en="Step 5 of 6" data-ar="الخطوة 5 من 6"></div>
+      <div class="cap-title" data-en="Check the *printed ticket*" data-ar="افحص *التذكرة المطبوعة*"></div>
+    </div>
+    <div class="cap" id="app-cap6">
+      <div class="cap-label" data-en="Step 6 of 6 · optional" data-ar="الخطوة 6 من 6 · اختيارية"></div>
+      <div class="cap-title" data-en="Check your *ticket software*" data-ar="افحص *برنامج التذاكر*"></div>
+      <div class="cap-help" data-en="Click Check ticket software, then print one ticket from it. Nothing is changed." data-ar="انقر «فحص برنامج التذاكر» ثم اطبع منه تذكرة واحدة. لا يتم تغيير أي شيء."></div>
+    </div>
+
+    <!-- The printed test ticket (test ticket layout from TestTicket/TestTicketLayout.cs) -->
+    <div class="tk-slot" id="app-slot"></div>
+    <div class="tk-clip" id="app-tkclip" data-layout-allow-overflow>
+      <div class="tk" id="app-tk" dir="ltr">
+        <svg viewBox="0 0 83.06 170.18" id="app-tksvg" aria-label="Printer test ticket">
+          <rect x="0" y="0" width="83.06" height="170.18" fill="#ffffff"></rect>
+          <rect x="4.2" y="4.2" width="74.66" height="161.78" fill="none" stroke="#9aa5af" stroke-width="0.25" stroke-dasharray="0.7 0.7"></rect>
+          <g id="app-tk-rulers" stroke="#30363d" stroke-width="0.18"></g>
+          <g id="app-tk-hl-top" opacity="0"><rect x="34" y="16" width="44" height="14" rx="1.5" fill="#f5b642" opacity="0.35"></rect></g>
+          <g id="app-tk-top">
+            <path d="M41.53 17 L45 22 L42.6 22 L42.6 29 L40.46 29 L40.46 22 L38.06 22 Z" fill="#111"></path>
+            <text x="47" y="24.6" font-size="3.4" font-weight="700" fill="#111" font-family="AmwagUI, sans-serif">TOP / FEED</text>
+          </g>
+          <text x="46" y="38.5" font-size="5.4" font-weight="700" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif">AMWAG Travel</text>
+          <text x="46" y="44.2" font-size="3.4" font-weight="700" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif">PRINTER TEST TICKET</text>
+          <text x="46" y="50.2" font-size="3.6" text-anchor="middle" fill="#111" font-family="AmwagUI, sans-serif" direction="rtl">تذكرة اختبار الطابعة</text>
+          <g font-size="2.7" fill="#111" font-family="AmwagUI, sans-serif">
+            <text x="17" y="57.5">Model: TA P-4030DN</text>
+            <text x="17" y="61.6">Printer: AMWAG Ticket Printer</text>
+            <text x="17" y="65.7">Paper: AMWAG Ticket</text>
+            <text x="17" y="69.8">83.06 x 170.18 mm (3.27 x 6.70 in)</text>
+            <text x="17" y="75.2" font-weight="700">Portrait, 100% scale:</text>
+            <text x="17" y="79.3" font-weight="700">the bars must measure exactly 50 mm</text>
+          </g>
+          <g stroke="#111" stroke-width="0.25" fill="#111">
+            <line x1="8" y1="86" x2="75" y2="86"></line>
+            <path d="M6.5 86 L9.5 84.6 L9.5 87.4 Z"></path><path d="M76.5 86 L73.5 84.6 L73.5 87.4 Z"></path>
+            <line x1="41.53" y1="81.5" x2="41.53" y2="100"></line>
+            <line x1="41.53" y1="126" x2="41.53" y2="160"></line>
+            <path d="M41.53 162 L40.13 159 L42.93 159 Z"></path>
+          </g>
+          <g id="app-tk-hl-bars" opacity="0" stroke="#f5b642" stroke-width="3" stroke-linecap="round" fill="none">
+            <line x1="16.5" y1="95" x2="66.5" y2="95"></line>
+            <line x1="70" y1="102" x2="70" y2="152"></line>
+          </g>
+          <g id="app-tk-bars" stroke="#111" fill="none">
+            <line x1="16.5" y1="95" x2="66.5" y2="95" stroke-width="1.1"></line>
+            <line x1="16.5" y1="93.3" x2="16.5" y2="96.7" stroke-width="0.35"></line>
+            <line x1="66.5" y1="93.3" x2="66.5" y2="96.7" stroke-width="0.35"></line>
+            <line x1="70" y1="102" x2="70" y2="152" stroke-width="1.1"></line>
+            <line x1="68.3" y1="102" x2="71.7" y2="102" stroke-width="0.35"></line>
+            <line x1="68.3" y1="152" x2="71.7" y2="152" stroke-width="0.35"></line>
+          </g>
+          <g font-size="2.7" font-weight="700" fill="#111" font-family="AmwagUI, sans-serif">
+            <text x="45" y="92" text-anchor="middle">50 mm</text>
+            <text x="66" y="128" text-anchor="end">50 mm</text>
+          </g>
+          <g font-size="2.5" fill="#111" font-family="AmwagUI, sans-serif">
+            <text x="17" y="104" font-weight="700">Check:</text>
+            <text x="17" y="108">1  All four corner marks printed</text>
+            <text x="17" y="111.8">2  Both bars measure 50 mm</text>
+            <text x="17" y="115.6">3  Text upright, nothing cut off</text>
+            <text x="17" y="119.4">4  Fed from the multipurpose tray</text>
+          </g>
+          <g id="app-tk-hl-corners" opacity="0" stroke="#f5b642" stroke-width="2.4" fill="none" stroke-linecap="round">
+            <path d="M6 13 L6 6 L13 6"></path><path d="M70.06 6 L77.06 6 L77.06 13"></path>
+            <path d="M6 157.18 L6 164.18 L13 164.18"></path><path d="M70.06 164.18 L77.06 164.18 L77.06 157.18"></path>
+          </g>
+          <g id="app-tk-corners" stroke="#111" stroke-width="0.7" fill="none">
+            <path d="M6 13 L6 6 L13 6"></path><path d="M70.06 6 L77.06 6 L77.06 13"></path>
+            <path d="M6 157.18 L6 164.18 L13 164.18"></path><path d="M70.06 164.18 L77.06 164.18 L77.06 157.18"></path>
+          </g>
+          <rect id="app-tk-hl-edge" x="0.8" y="0.8" width="81.46" height="168.58" fill="none" stroke="#f5b642" stroke-width="1.6" opacity="0"></rect>
+        </svg>
+      </div>
+    </div>
+    <div class="tk-labels" id="app-tklabels">
+      <div class="tk-l" id="app-tl1"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span data-en="All four corner marks" data-ar="علامات الزوايا الأربع"></span></div>
+      <div class="tk-l" id="app-tl2"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span data-en="Both bars 50 mm" data-ar="الشريطان 50 مم"></span></div>
+      <div class="tk-l" id="app-tl3"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span data-en="Upright, nothing cut off" data-ar="النص سليم وغير مقطوع"></span></div>
+      <div class="tk-l" id="app-tl4"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#2e7d32"></circle><path d="M8 14.5 L12.2 18.5 L20 10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span data-en="From the multipurpose tray" data-ar="من الدرج متعدد الأغراض"></span></div>
+    </div>
+
+    <!-- The AMWAG Printer Setup window -->
+    <div class="app-view" id="app-view" data-layout-allow-overflow>
+      <div class="app-cam" id="app-cam">
+        <div class="win" id="app-win">
+          <div class="tb" data-layout-ignore>
+            <img src="assets/img/app-icon.png" alt="" />
+            <div class="tb-title">AMWAG Printer Setup</div>
+            <div class="tb-ctl"><span>&#8212;</span><span>&#9744;</span><span>&#10005;</span></div>
+          </div>
+          <div class="hd" data-layout-ignore>
+            <img src="assets/img/amwag-mark.svg" alt="AMWAG" />
+            <div class="hd-title">AMWAG Printer Setup</div>
+            <div class="hd-sub" data-en="Sets up the ticket printer for your branch" data-ar="إعداد طابعة التذاكر في فرعك"></div>
+            <div class="hd-lang" data-en="العربية" data-ar="English"></div>
+          </div>
+          <div class="bd">
+            <div class="steps" id="app-steps" data-layout-allow-overflow data-layout-ignore></div>
+            <div class="content">
+
+              <!-- Progress view (UI/Views/ProgressView.cs) -->
+              <div class="view" id="app-v-progress"><div class="vin">
+                <div class="v-h" data-en="Setting up your ticket printer" data-ar="جارٍ إعداد طابعة التذاكر"></div>
+                <div class="v-p" data-en="This usually takes less than a minute. You will only be asked something if it is really needed." data-ar="يستغرق ذلك عادةً أقل من دقيقة، ولن يُطلب منك أي شيء إلا عند الضرورة."></div>
+                <div class="run-row" style="top:118px">
+                  <div class="ring" id="app-pring"></div>
+                  <div class="run-t" id="app-pt0" data-en="Starting…" data-ar="جارٍ البدء…"></div>
+                  <div class="run-t" id="app-pt1" data-en="Looking for your printer…" data-ar="جارٍ البحث عن الطابعة…"></div>
+                  <div class="run-t" id="app-pt2" data-en="Checking the printer driver…" data-ar="جارٍ فحص برنامج تشغيل الطابعة…"></div>
+                  <div class="run-t" id="app-pt3" data-en="Installing the printer driver…" data-ar="جارٍ تثبيت برنامج تشغيل الطابعة…"></div>
+                  <div class="run-t" id="app-pt4" data-en="Setting up the ticket paper size…" data-ar="جارٍ ضبط حجم ورق التذكرة…"></div>
+                  <div class="run-t" id="app-pt5" data-en="Checking that the settings were saved…" data-ar="جارٍ التحقق من حفظ الإعدادات…"></div>
+                  <div class="run-t" id="app-pt6" data-en="Finishing…" data-ar="جارٍ الإنهاء…"></div>
+                </div>
+                <div class="detail" style="top:166px">
+                  <span id="app-pd1" data-en="Checking file integrity and digital signature…" data-ar="جارٍ التحقق من سلامة الملفات والتوقيع الرقمي…"></span>
+                  <span id="app-pd2" data-en="Installing…" data-ar="جارٍ التثبيت…"></span>
+                  <span id="app-pd3" data-en="Applying settings…" data-ar="جارٍ تطبيق الإعدادات…"></span>
+                </div>
+                <div class="notice" id="app-notice">
+                  <svg viewBox="0 0 20 22"><path d="M10 1 L18.5 4.2 L18.5 10.5 C18.5 15.5 14.8 19.3 10 21 C5.2 19.3 1.5 15.5 1.5 10.5 L1.5 4.2 Z" fill="#2f74c0"></path><path d="M10 1 L10 21 C14.8 19.3 18.5 15.5 18.5 10.5 L18.5 4.2 Z" fill="#f5b642"></path></svg>
+                  <div data-en="Windows will now ask for permission to install the printer driver and create the ticket paper size. Please choose Yes." data-ar="سيطلب Windows الآن إذنًا لتثبيت برنامج تشغيل الطابعة وإنشاء حجم ورق التذكرة. يُرجى اختيار «نعم»."></div>
+                </div>
+                <div class="card" id="app-pcard" style="top:200px; height:186px">
+                  <div class="card-t" data-en="Your printer" data-ar="الطابعة"></div>
+                  <div class="row" style="top:42px" id="app-pr1"><b data-en="Printer model" data-ar="طراز الطابعة"></b><span><bdi>TA P-4030DN</bdi></span></div>
+                  <div class="row" style="top:70px" id="app-pr2"><b data-en="Connection" data-ar="الاتصال"></b><span data-en="USB cable, port USB001" data-ar="كابل USB، المنفذ USB001"></span></div>
+                  <div class="row" style="top:98px" id="app-pr3"><b data-en="Driver" data-ar="برنامج التشغيل"></b><span><bdi>P-4030DN v4 KX (PCL6)</bdi></span></div>
+                  <div class="row" style="top:126px" id="app-pr4"><b data-en="Printer name" data-ar="اسم الطابعة"></b><span><bdi>AMWAG Ticket Printer</bdi></span></div>
+                  <div class="row" style="top:154px" id="app-pr5"><div class="row-hl" id="app-pr5-hl"></div><b data-en="Ticket size" data-ar="حجم ورق التذكرة"></b><span><bdi>AMWAG Ticket 83.06 x 170.18 mm (3.27 x 6.70 in)</bdi></span></div>
+                </div>
+              </div></div>
+
+              <!-- Result view (UI/Views/ResultView.cs) -->
+              <div class="view" id="app-v-result"><div class="vin">
+                <div class="res-ico" id="app-res-ico"><svg viewBox="0 0 20 20"><path d="M4 10.5 L8.2 14.5 L16 6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                <div class="res-t" data-en="Ready to print tickets" data-ar="جاهزة لطباعة التذاكر"></div>
+                <div class="res-p" data-en="The ticket printer is set up and every setting was checked." data-ar="تم إعداد طابعة التذاكر والتحقق من جميع الإعدادات."></div>
+                <div class="card" style="top:90px; height:214px">
+                  <div class="card-t" data-en="Summary" data-ar="الملخص"></div>
+                  <div class="row" style="top:40px"><b data-en="Printer model" data-ar="طراز الطابعة"></b><span><bdi>TA P-4030DN</bdi></span></div>
+                  <div class="row" style="top:68px"><b data-en="Printer name" data-ar="اسم الطابعة"></b><span><bdi>AMWAG Ticket Printer</bdi></span></div>
+                  <div class="row" style="top:96px"><b data-en="Driver" data-ar="برنامج التشغيل"></b><span><bdi>P-4030DN v4 KX (PCL6)</bdi></span></div>
+                  <div class="row" style="top:124px"><b data-en="Connection" data-ar="الاتصال"></b><span><bdi>USB (USB001)</bdi></span></div>
+                  <div class="row" style="top:152px"><b data-en="Ticket size" data-ar="حجم ورق التذكرة"></b><span><bdi>AMWAG Ticket 83.06 x 170.18 mm (3.27 x 6.70 in)</bdi></span></div>
+                  <div class="row" style="top:180px"><b data-en="Paper source" data-ar="مصدر الورق"></b><span data-en="Multipurpose tray" data-ar="الدرج متعدد الأغراض"></span></div>
+                </div>
+                <div class="lnk" style="top:318px; inset-inline-start:14px" data-en="Show details" data-ar="عرض التفاصيل"></div>
+                <div class="btn btn-a" id="app-b-ptt" style="top:380px; width:150px"><div class="btn-hover"></div><div class="btn-press"></div><label data-en="Print Test Ticket" data-ar="طباعة تذكرة اختبار"></label></div>
+                <div class="btn btn-o" style="top:380px; width:96px; inset-inline-start:160px" data-en="Repair" data-ar="إصلاح"></div>
+                <div class="btn btn-o" style="top:380px; width:96px; inset-inline-start:266px" data-en="Close" data-ar="إغلاق"></div>
+                <div class="lnk" id="app-l-soft" style="top:440px; inset-inline-start:10px" data-en="Check ticket software" data-ar="فحص برنامج التذاكر"></div>
+                <div class="lnk" style="top:440px; inset-inline-start:174px" data-en="Save report…" data-ar="حفظ التقرير…"></div>
+                <div class="lnk" style="top:440px; inset-inline-start:280px" data-en="Copy report" data-ar="نسخ التقرير"></div>
+                <div class="lnk" style="top:440px; inset-inline-start:380px; color:#b4bec8" data-en="Open log folder" data-ar="فتح مجلد السجلات"></div>
+              </div></div>
+
+              <!-- Test print view (UI/Views/TestPrintView.cs) -->
+              <div class="view" id="app-v-test"><div class="vin">
+                <div class="v-h" data-en="Print a test ticket" data-ar="طباعة تذكرة اختبار"></div>
+                <div class="v-p v-strong" data-en="Load ticket paper into the multipurpose tray, then click Print." data-ar="ضع ورق التذاكر في الدرج متعدد الأغراض، ثم انقر «طباعة»."></div>
+                <div class="v-p" style="top:90px" data-en="The test ticket has corner marks, rulers and two 50 mm bars, so you can check its size and position." data-ar="تحتوي تذكرة الاختبار على علامات زوايا ومساطر وشريطين بطول 50 مم، لتتحقق من حجمها وموضعها."></div>
+                <div class="run-row" style="top:160px; opacity:0" id="app-trow">
+                  <div class="ring" id="app-tring"></div>
+                  <div class="run-t" id="app-tt1" data-en="Sending the test ticket to the printer…" data-ar="جارٍ إرسال تذكرة الاختبار إلى الطابعة…"></div>
+                  <div class="run-t" id="app-tt2" data-en="Printing…" data-ar="جارٍ الطباعة…"></div>
+                </div>
+                <div class="btn btn-a" id="app-b-print" style="top:380px; width:96px"><div class="btn-hover"></div><div class="btn-press"></div><label data-en="Print" data-ar="طباعة"></label></div>
+                <div class="btn btn-o" style="top:380px; width:96px; inset-inline-start:106px" data-en="Back" data-ar="رجوع"></div>
+              </div></div>
+
+              <!-- Sent view: check the printed ticket -->
+              <div class="view" id="app-v-sent"><div class="vin">
+                <div class="v-h" data-en="Windows sent the test ticket to the printer" data-ar="أرسل Windows تذكرة الاختبار إلى الطابعة"></div>
+                <div class="v-p v-strong" data-en="Please check the printed ticket:" data-ar="يُرجى فحص التذكرة المطبوعة:"></div>
+                <div class="chk" style="top:100px"><i></i><em id="app-c1"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span data-en="All four corner marks are visible" data-ar="علامات الزوايا الأربع ظاهرة"></span></div>
+                <div class="chk" style="top:132px"><i></i><em id="app-c2"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span data-en="Both bars measure exactly 50 mm" data-ar="طول كل من الشريطين 50 مم بالضبط"></span></div>
+                <div class="chk" style="top:164px"><i></i><em id="app-c3"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span data-en="The text is upright and nothing is cut off" data-ar="النص في الاتجاه الصحيح ولا يوجد شيء مقطوع"></span></div>
+                <div class="chk" style="top:196px"><i></i><em id="app-c4"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></em><span data-en="The ticket came from the multipurpose tray" data-ar="سُحبت التذكرة من الدرج متعدد الأغراض"></span></div>
+                <div class="btn btn-a" id="app-b-ok" style="top:380px; width:150px"><div class="btn-hover"></div><div class="btn-press"></div><label data-en="Printed correctly" data-ar="طُبعت بشكل صحيح"></label></div>
+                <div class="btn btn-o" style="top:380px; width:160px; inset-inline-start:160px" data-en="There is a problem" data-ar="توجد مشكلة"></div>
+                <div class="lnk" style="top:391px; inset-inline-start:344px" data-en="Back" data-ar="رجوع"></div>
+              </div></div>
+
+              <!-- Ticket software check (UI/Views/TicketCheckView.cs) -->
+              <div class="view" id="app-v-soft"><div class="vin">
+                <div class="v-h" data-en="Check the ticket software" data-ar="فحص برنامج التذاكر"></div>
+                <div class="v-p v-strong" data-en="Print one ticket from your ticket software now." data-ar="اطبع الآن تذكرة واحدة من برنامج التذاكر."></div>
+                <div class="run-row" style="top:104px" id="app-srow">
+                  <div class="ring" id="app-sring"></div>
+                  <div class="run-t" id="app-st1" data-en="Waiting for a print job… 1:59 left" data-ar="في انتظار مهمة طباعة… الوقت المتبقي 1:59"></div>
+                  <div class="run-t" id="app-st2" data-en="Waiting for a print job… 1:58 left" data-ar="في انتظار مهمة طباعة… الوقت المتبقي 1:58"></div>
+                  <div class="run-t" id="app-st3" data-en="Print job found. Reading its settings…" data-ar="تم العثور على مهمة طباعة. جارٍ قراءة إعداداتها…"></div>
+                </div>
+                <div class="banner" id="app-banner">
+                  <div class="res-ico"><svg viewBox="0 0 20 20"><path d="M4 10.5 L8.2 14.5 L16 6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  <b data-en="The ticket software uses the ticket settings" data-ar="يستخدم برنامج التذاكر إعدادات التذكرة"></b>
+                  <span data-en="The print job asked for the AMWAG Ticket settings. Nothing needs to change." data-ar="طلبت مهمة الطباعة إعدادات تذكرة AMWAG. لا يلزم تغيير أي شيء."></span>
+                </div>
+                <div class="tbl" id="app-tbl">
+                  <div class="tbl-h"><span class="c1" data-en="Setting" data-ar="الإعداد"></span><span class="c2" data-en="Ticket software asked for" data-ar="ما طلبه برنامج التذاكر"></span><span class="c3" data-en="AMWAG Ticket default" data-ar="إعداد تذكرة AMWAG"></span></div>
+                  <div class="tr" id="app-tr1" style="top:44px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1" data-en="Paper size" data-ar="حجم الورق"></span><small data-en="Matches" data-ar="مطابق"></small><span class="c2"><bdi>AMWAG Ticket</bdi></span><span class="c3"><bdi>AMWAG Ticket</bdi></span></div>
+                  <div class="tr" id="app-tr2" style="top:88px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1" data-en="Orientation" data-ar="الاتجاه"></span><small data-en="Matches" data-ar="مطابق"></small><span class="c2" data-en="Portrait" data-ar="عمودي"></span><span class="c3" data-en="Portrait" data-ar="عمودي"></span></div>
+                  <div class="tr" id="app-tr3" style="top:132px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1" data-en="Two-sided printing" data-ar="الطباعة على الوجهين"></span><small data-en="Matches" data-ar="مطابق"></small><span class="c2" data-en="Off (single-sided)" data-ar="متوقفة (وجه واحد)"></span><span class="c3" data-en="Off (single-sided)" data-ar="متوقفة (وجه واحد)"></span></div>
+                  <div class="tr" id="app-tr4" style="top:176px"><div class="ok"><svg viewBox="0 0 10 10"><path d="M2 5.2 L4.2 7.3 L8.2 3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></div><span class="c1" data-en="Paper source" data-ar="مصدر الورق"></span><small data-en="Matches" data-ar="مطابق"></small><span class="c2" data-en="Multipurpose tray" data-ar="الدرج متعدد الأغراض"></span><span class="c3" data-en="Multipurpose tray" data-ar="الدرج متعدد الأغراض"></span></div>
+                </div>
+              </div></div>
+
+            </div>
+          </div>
+          <div class="ft" data-layout-ignore>
+            <span style="inset-inline-start:27px" data-en="© 2026 AMWAG Travel · AMWAG IT Department" data-ar="© 2026 أمواج ترافيل · إدارة تكنولوجيا المعلومات"></span>
+            <span style="inset-inline-end:27px"><span style="position:static" data-en="Developed by" data-ar="تطوير"></span>&#160;&#160;&#160;<b style="color:#15191d;font-weight:600" data-en="Eng. Abdelhmeed Elshorbagy ↗" data-ar="م. عبدالحميد الشوربجي ↗"></b></span>
+          </div>
+        </div>
+
+        <!-- Windows permission prompt -->
+        <div class="shade" id="app-shade" data-layout-allow-occlusion></div>
+        <div class="dlg" id="app-dlg" data-layout-allow-occlusion data-layout-allow-overlap>
+          <div class="dlg-h" data-en="User Account Control" data-ar="التحكم في حساب المستخدم"></div>
+          <div class="dlg-q" data-en="Do you want to allow this app to make changes to your device?" data-ar="هل تريد السماح لهذا التطبيق بإجراء تغييرات على جهازك؟"></div>
+          <div class="dlg-app"><img src="assets/img/app-icon.png" alt="" /><span>AMWAG Printer Setup</span></div>
+          <div class="dlg-f">
+            <div class="dlg-b dlg-yes" id="app-yes"><i id="app-yes-press"></i><label data-en="Yes" data-ar="نعم"></label></div>
+            <div class="dlg-b dlg-no" data-en="No" data-ar="لا"></div>
+          </div>
+        </div>
+
+        <div class="spot" id="app-spot" data-layout-allow-occlusion></div>
+        <svg class="cursor" id="app-cursor" viewBox="0 0 24 36" aria-hidden="true">
+          <path d="M1.5 1.5 L1.5 28 L8 21.8 L12.4 32.4 L17 30.4 L12.6 20 L21.5 20 Z" fill="#ffffff" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+      const AR = vars.lang === "ar";
+      const root = document.querySelector(".scene-app");
+      root.setAttribute("dir", AR ? "rtl" : "ltr");
+      root.setAttribute("lang", AR ? "ar" : "en");
+      document.getElementById("app-tk").setAttribute("dir", "ltr");
+
+      // ---------- Step list, from the app's own strings (Localization/Strings.Steps.cs) ----------
+      const STEPS = [
+        { t: ["Detecting printer", "البحث عن الطابعة"], run: ["Looking for your printer…", "جارٍ البحث عن الطابعة…"], done: ["Printer found", "تم العثور على الطابعة"] },
+        { t: ["Checking driver", "فحص برنامج التشغيل"], run: ["Checking the printer driver…", "جارٍ فحص برنامج تشغيل الطابعة…"], done: ["Driver will be installed", "سيتم تثبيت برنامج التشغيل"] },
+        { t: ["Installing driver", "تثبيت برنامج التشغيل"], run: ["Installing the printer driver…", "جارٍ تثبيت برنامج تشغيل الطابعة…"], done: ["Driver installed", "تم تثبيت برنامج التشغيل"] },
+        { t: ["Configuring ticket size", "ضبط حجم التذكرة"], run: ["Setting up the ticket paper size…", "جارٍ ضبط حجم ورق التذكرة…"], done: ["Ticket size set", "تم ضبط حجم التذكرة"] },
+        { t: ["Verification", "التحقق"], run: ["Checking that the settings were saved…", "جارٍ التحقق من حفظ الإعدادات…"], done: ["All settings verified", "تم التحقق من جميع الإعدادات"] },
+        { t: ["Ready", "جاهزة للطباعة"], run: ["Finishing…", "جارٍ الإنهاء…"], done: ["Ready to print tickets", "جاهزة لطباعة التذاكر"] },
+      ];
+      const RUN = [0.6, 2.4, 4.0, 13.1, 14.5, 15.7];
+      const DONE = [2.2, 3.8, 13.0, 14.4, 15.6, 16.2];
+      const L = (pair) => pair[AR ? 1 : 0];
+      const stepsEl = document.getElementById("app-steps");
+      const check = '<svg viewBox="0 0 14 14"><path d="M3 7.3 L6 10.2 L11.2 4.4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+      STEPS.forEach((s, i) => {
+        const top = 24 + 56 * i;
+        if (i < STEPS.length - 1) {
+          const line = document.createElement("div");
+          line.className = "st-line";
+          line.style.top = top + 34 + "px";
+          line.innerHTML = '<i id="app-sl' + i + '"></i>';
+          stepsEl.appendChild(line);
+        }
+        const el = document.createElement("div");
+        el.className = "st";
+        el.style.top = top + "px";
+        el.innerHTML =
+          '<div class="st-g g-wait" id="app-gw' + i + '"></div>' +
+          '<div class="st-g g-run" id="app-gr' + i + '"></div>' +
+          '<div class="st-g g-done" id="app-gd' + i + '">' + check + "</div>" +
+          '<div class="st-t"></div>' +
+          '<div class="st-s s-wait" id="app-sw' + i + '"></div>' +
+          '<div class="st-s s-run" id="app-sr' + i + '"></div>' +
+          '<div class="st-s s-done" id="app-sd' + i + '"></div>';
+        el.querySelector(".st-t").textContent = L(s.t);
+        el.querySelector(".s-wait").textContent = AR ? "في الانتظار" : "Waiting";
+        el.querySelector(".s-run").textContent = L(s.run);
+        el.querySelector(".s-done").textContent = L(s.done);
+        stepsEl.appendChild(el);
+      });
+
+      // ---------- Ticket rulers (every 5 mm, numbered every 10 mm) ----------
+      const NS = "http://www.w3.org/2000/svg";
+      const rulers = document.getElementById("app-tk-rulers");
+      function line(x1, y1, x2, y2) {
+        const l = document.createElementNS(NS, "line");
+        l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2);
+        rulers.appendChild(l);
+      }
+      function label(x, y, t) {
+        const e = document.createElementNS(NS, "text");
+        e.setAttribute("x", x); e.setAttribute("y", y); e.setAttribute("font-size", "2"); e.setAttribute("fill", "#30363d");
+        e.setAttribute("stroke", "none"); e.setAttribute("font-family", "AmwagUI, sans-serif");
+        e.textContent = t;
+        rulers.appendChild(e);
+      }
+      for (let mm = 5; mm < 83; mm += 5) { line(mm, 9, mm, mm % 10 === 0 ? 12.4 : 10.8); if (mm % 10 === 0 && mm < 80) label(mm - 1.2, 15, String(mm)); }
+      for (let mm = 5; mm < 170; mm += 5) { line(9, mm, mm % 10 === 0 ? 12.4 : 10.8, mm); if (mm % 10 === 0 && mm > 10 && mm < 160) label(1.6, mm + 0.7, String(mm)); }
+
+      // ---------- Text, in the chosen language ----------
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      root.querySelectorAll("[data-en]").forEach((el) => {
+        const text = AR ? el.dataset.ar : el.dataset.en;
+        if (text.includes("*")) el.innerHTML = esc(text).replace(/\*([^*]+)\*/g, '<span class="hl">$1</span>');
+        else el.textContent = text;
+      });
+      function words(el) {
+        // One span per word; in Arabic a run of Latin words (a product name) stays one left-to-right span.
+        const groups = [];
+        Array.from(el.childNodes).forEach((node) => {
+          const hl = node.nodeType === 1;
+          node.textContent.split(" ").filter(Boolean).forEach((t) => {
+            const latin = /[A-Za-z]/.test(t) && !/[؀-ۿ]/.test(t);
+            const last = groups[groups.length - 1];
+            if (AR && latin && last && last.latin && last.hl === hl) last.text += " " + t;
+            else groups.push({ text: t, latin: latin, hl: hl });
+          });
+        });
+        el.textContent = "";
+        return groups.map((g, i) => {
+          const s = document.createElement("span");
+          s.className = "w" + (g.hl ? " hl" : "");
+          if (AR && g.latin) s.setAttribute("dir", "ltr");
+          s.textContent = g.text;
+          el.appendChild(s);
+          // The space sits between pieces, so it lands on the correct side in both directions.
+          if (i < groups.length - 1) el.appendChild(document.createTextNode(" "));
+          return s;
+        });
+      }
+      const capWords = {};
+      ["app-cap2", "app-cap3", "app-cap4", "app-cap5", "app-cap5b", "app-cap6"].forEach((id) => {
+        capWords[id] = words(document.querySelector("#" + id + " .cap-title"));
+      });
+
+      // ---------- Geometry ----------
+      // Window-space point (840 x 668 logical px). The window mirrors in Arabic; the mouse pointer does not.
+      const P = (x, y) => ({ x: AR ? 840 - x : x, y: y });
+      const BASE = 1.3;
+      function focus(x, y, z) {
+        const s = BASE * z;
+        const px = AR ? 840 - x : x;
+        return {
+          scale: s,
+          x: Math.min(0, Math.max(1092 - 840 * s, 546 - px * s)),
+          y: Math.min(0, Math.max(868 - 668 * s, 434 - y * s)),
+        };
+      }
+      const HOME = { scale: BASE, x: 0, y: 0 };
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#app-wave", { x: -118 }, { x: -548, duration: 39, ease: "none" }, 0);
+      tl.set("#app-cam", HOME, 0);
+      tl.set("#app-v-progress", { opacity: 1 }, 0);
+      tl.set("#app-pt0", { opacity: 1 }, 0);
+
+      // The window arrives out of the splash zoom.
+      tl.fromTo("#app-view", { opacity: 0, scale: 0.94, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0);
+
+      // ---------- Captions ----------
+      const AMBER = "#f5b642", WHITE = "#ffffff", DIM = "rgba(255,255,255,0.18)";
+      function rail(step, at) {
+        for (let i = 1; i <= 6; i++) {
+          const c = i < step ? AMBER : i === step ? WHITE : DIM;
+          tl.to("#app-r" + i, { backgroundColor: c, duration: 0.3, ease: "power2.out" }, at);
+        }
+      }
+      function capIn(id, at) {
+        tl.set("#" + id, { opacity: 1, filter: "blur(0px)" }, at);
+        tl.fromTo("#" + id + " .cap-label", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, at);
+        tl.fromTo(capWords[id], { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, ease: "power2.out", stagger: 0.067 }, at + 0.1);
+        const help = document.querySelector("#" + id + " .cap-help");
+        if (help) tl.fromTo(help, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, at + 0.45);
+      }
+      function capOut(id, at) {
+        tl.to("#" + id, { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power2.in" }, at);
+      }
+      tl.set("#app-r1", { backgroundColor: AMBER }, 0);
+      tl.set("#app-r2", { backgroundColor: WHITE }, 0);
+      tl.fromTo("#app-rail", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.2);
+      capIn("app-cap2", 0.3);  capOut("app-cap2", 6.0);
+      rail(3, 6.3); capIn("app-cap3", 6.3);  capOut("app-cap3", 12.3);
+      rail(4, 12.6); capIn("app-cap4", 12.6); capOut("app-cap4", 19.3);
+      rail(5, 19.6); capIn("app-cap5", 19.6); capOut("app-cap5", 24.2);
+      tl.to("#app-rail", { opacity: 0, duration: 0.2 }, 24.2);
+      capIn("app-cap5b", 24.45); capOut("app-cap5b", 31.0);
+      tl.to("#app-rail", { opacity: 1, duration: 0.3 }, 31.3);
+      rail(6, 31.4); capIn("app-cap6", 31.4); capOut("app-cap6", 38.3);
+      tl.to("#app-rail", { opacity: 0, filter: "blur(6px)", duration: 0.22, ease: "power2.in" }, 38.3);
+
+      // ---------- Step list ticks ----------
+      STEPS.forEach((s, i) => {
+        tl.set("#app-gw" + i, { opacity: 0 }, RUN[i]);
+        tl.set("#app-gr" + i, { opacity: 1 }, RUN[i]);
+        tl.fromTo("#app-gr" + i, { rotation: 0 }, { rotation: 360 * Math.ceil((DONE[i] - RUN[i]) / 0.9), duration: DONE[i] - RUN[i], ease: "none" }, RUN[i]);
+        tl.set("#app-sw" + i, { opacity: 0 }, RUN[i]);
+        tl.set("#app-sr" + i, { opacity: 1 }, RUN[i]);
+        tl.set("#app-gr" + i, { opacity: 0 }, DONE[i]);
+        tl.fromTo("#app-gd" + i, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, DONE[i]);
+        tl.set("#app-sr" + i, { opacity: 0 }, DONE[i]);
+        tl.fromTo("#app-sd" + i, { opacity: 0 }, { opacity: 1, duration: 0.15 }, DONE[i]);
+        if (i < STEPS.length - 1) tl.to("#app-sl" + i, { opacity: 1, duration: 0.3, ease: "power2.out" }, DONE[i]);
+      });
+
+      // ---------- Progress view ----------
+      tl.fromTo("#app-pring", { rotation: 0 }, { rotation: 360 * 18, duration: 16.4, ease: "none" }, 0);
+      const PT = [[0, 0.6], [0.6, 2.4], [2.4, 4.0], [4.0, 13.1], [13.1, 14.5], [14.5, 15.7], [15.7, 16.4]];
+      PT.forEach(([a, b], i) => {
+        if (i > 0) tl.fromTo("#app-pt" + i, { opacity: 0 }, { opacity: 1, duration: 0.15 }, a);
+        tl.set("#app-pt" + i, { opacity: 0 }, b);
+      });
+      tl.fromTo("#app-pd1", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 4.3);
+      tl.set("#app-pd1", { opacity: 0 }, 5.8);
+      tl.fromTo("#app-pd2", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 5.8);
+      tl.set("#app-pd2", { opacity: 0 }, 13.0);
+      tl.fromTo("#app-pd3", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 13.1);
+      tl.set("#app-pd3", { opacity: 0 }, 14.4);
+      // The printer card fills row by row once the printer is found.
+      tl.fromTo("#app-pcard", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 2.25);
+      for (let r = 1; r <= 5; r++) tl.fromTo("#app-pr" + r, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 2.35 + 0.18 * (r - 1));
+      // The permission notice slides in above the card.
+      tl.to("#app-pcard", { y: 80, duration: 0.45, ease: "power3.out" }, 6.15);
+      tl.fromTo("#app-notice", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 6.25);
+      const nf = focus(547, 349, 1.45);
+      tl.to("#app-cam", { ...nf, duration: 0.7, ease: "power2.inOut" }, 6.5);
+      tl.to("#app-cam", { ...HOME, duration: 0.6, ease: "power2.inOut" }, 8.35);
+      tl.to("#app-notice", { opacity: 0, duration: 0.25 }, 12.2);
+      tl.to("#app-pcard", { y: 0, duration: 0.45, ease: "power3.inOut" }, 12.3);
+      // The ticket size row lights up while it is configured.
+      tl.fromTo("#app-pr5-hl", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 13.1);
+      tl.to("#app-pr5-hl", { opacity: 0, duration: 0.4 }, 14.9);
+
+      // ---------- Windows permission prompt ----------
+      const c0 = P(600, 600), yes = P(315, 421);
+      tl.fromTo("#app-shade", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 9.0);
+      tl.fromTo("#app-dlg", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 9.05);
+      tl.fromTo("#app-cursor", { opacity: 0, x: c0.x, y: c0.y, scale: 1 }, { opacity: 1, duration: 0.15 }, 10.2);
+      tl.to("#app-cursor", { x: yes.x, y: yes.y, duration: 0.9, ease: "power2.inOut" }, 10.3);
+      function click(at, press) {
+        tl.to("#app-cursor", { scale: 0.88, duration: 0.05, ease: "power1.out", transformOrigin: "0 0" }, at);
+        tl.to("#app-cursor", { scale: 1, duration: 0.08, ease: "power1.out" }, at + 0.05);
+        if (press) {
+          tl.to(press, { opacity: 1, duration: 0.05 }, at);
+          tl.to(press, { opacity: 0, duration: 0.15 }, at + 0.12);
+        }
+      }
+      click(11.6, "#app-yes-press");
+      tl.to("#app-dlg", { opacity: 0, scale: 0.97, duration: 0.18, ease: "power2.in" }, 11.75);
+      tl.to("#app-shade", { opacity: 0, duration: 0.25 }, 11.8);
+      tl.to("#app-cursor", { opacity: 0, duration: 0.2 }, 11.95);
+
+      // ---------- Result: Ready to print tickets ----------
+      tl.to("#app-v-progress", { opacity: 0, filter: "blur(6px)", duration: 0.15, ease: "power2.in" }, 16.35);
+      tl.fromTo("#app-v-result", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 16.45);
+      tl.fromTo("#app-res-ico", { scale: 0.5 }, { scale: 1, duration: 0.45, ease: "expo.out" }, 16.45);
+      const rf = focus(547, 177, 1.42);
+      tl.to("#app-cam", { ...rf, duration: 0.7, ease: "power2.inOut" }, 16.7);
+      tl.to("#app-cam", { ...HOME, duration: 0.6, ease: "power2.inOut" }, 18.9);
+
+      // ---------- Print Test Ticket ----------
+      const c1 = P(620, 640), ptt = P(358, 517), prn = P(331, 517);
+      tl.fromTo("#app-cursor", { x: c1.x, y: c1.y, opacity: 0 }, { opacity: 1, duration: 0.15, immediateRender: false }, 19.5);
+      tl.to("#app-cursor", { x: ptt.x, y: ptt.y, duration: 0.8, ease: "power2.inOut" }, 19.6);
+      tl.to("#app-b-ptt .btn-hover", { opacity: 1, duration: 0.1 }, 20.3);
+      click(20.6, "#app-b-ptt .btn-press");
+      tl.to("#app-v-result", { opacity: 0, filter: "blur(6px)", duration: 0.13, ease: "power2.in" }, 20.75);
+      tl.set("#app-b-ptt .btn-hover", { opacity: 0 }, 20.9);
+      tl.fromTo("#app-v-test", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 20.85);
+      tl.to("#app-cursor", { x: prn.x, y: prn.y, duration: 0.5, ease: "power2.inOut" }, 21.8);
+      tl.to("#app-b-print .btn-hover", { opacity: 1, duration: 0.1 }, 22.3);
+      click(22.6, "#app-b-print .btn-press");
+      tl.to("#app-cursor", { opacity: 0, duration: 0.2 }, 22.95);
+      tl.set("#app-b-print .btn-hover", { opacity: 0 }, 22.8);
+      tl.fromTo("#app-trow", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 22.75);
+      tl.fromTo("#app-tring", { rotation: 0 }, { rotation: 360 * 2, duration: 1.7, ease: "none" }, 22.75);
+      tl.fromTo("#app-tt1", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 22.75);
+      tl.set("#app-tt1", { opacity: 0 }, 23.6);
+      tl.fromTo("#app-tt2", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 23.6);
+      tl.to("#app-v-test", { opacity: 0, filter: "blur(6px)", duration: 0.13, ease: "power2.in" }, 24.4);
+      tl.fromTo("#app-v-sent", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 24.5);
+
+      // The ticket feeds out of the printer beside the window.
+      tl.fromTo("#app-slot", { opacity: 0, scaleX: 0.7 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "expo.out" }, 24.45);
+      tl.set("#app-tk", { opacity: 1 }, 24.7);
+      tl.fromTo("#app-tk", { y: -660 }, { y: 0, duration: 1.4, ease: "power2.out" }, 24.7);
+      const sf = focus(547, 265, 1.42);
+      tl.to("#app-cam", { ...sf, duration: 0.7, ease: "power2.inOut" }, 25.5);
+      // Each check ticks in the app while its mark lights up on the ticket.
+      [["#app-c1", "#app-tl1", "#app-tk-hl-corners", 26.6], ["#app-c2", "#app-tl2", "#app-tk-hl-bars", 27.5],
+       ["#app-c3", "#app-tl3", "#app-tk-hl-top", 28.4], ["#app-c4", "#app-tl4", "#app-tk-hl-edge", 29.3]].forEach(([c, lbl, hl, at]) => {
+        tl.fromTo(c, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, at);
+        tl.fromTo(hl, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, at);
+        tl.fromTo(lbl, { opacity: 0, x: AR ? 16 : -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, at);
+      });
+      tl.to("#app-cam", { ...HOME, duration: 0.6, ease: "power2.inOut" }, 29.85);
+      const c2 = P(620, 620), ok = P(358, 517);
+      tl.fromTo("#app-cursor", { x: c2.x, y: c2.y, opacity: 0 }, { opacity: 1, duration: 0.15, immediateRender: false }, 29.95);
+      tl.to("#app-cursor", { x: ok.x, y: ok.y, duration: 0.7, ease: "power2.inOut" }, 30.0);
+      tl.to("#app-b-ok .btn-hover", { opacity: 1, duration: 0.1 }, 30.6);
+      click(30.9, "#app-b-ok .btn-press");
+      tl.to("#app-v-sent", { opacity: 0, filter: "blur(6px)", duration: 0.13, ease: "power2.in" }, 31.05);
+      tl.fromTo("#app-v-result", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out", immediateRender: false }, 31.1);
+      tl.to(["#app-tkclip", "#app-slot", "#app-tklabels"], { opacity: 0, y: 40, duration: 0.4, ease: "power2.in" }, 31.0);
+
+      // ---------- Check ticket software ----------
+      const soft = P(359, 566);
+      tl.to("#app-cursor", { x: soft.x, y: soft.y, duration: 0.7, ease: "power2.inOut" }, 31.7);
+      tl.set("#app-l-soft", { textDecoration: "underline" }, 32.3);
+      click(32.6, null);
+      tl.to("#app-cursor", { opacity: 0, duration: 0.2 }, 32.95);
+      tl.to("#app-v-result", { opacity: 0, filter: "blur(6px)", duration: 0.13, ease: "power2.in" }, 32.75);
+      tl.fromTo("#app-v-soft", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 32.8);
+      tl.fromTo("#app-sring", { rotation: 0 }, { rotation: 360 * 3, duration: 2.4, ease: "none" }, 32.8);
+      tl.fromTo("#app-st1", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 32.8);
+      tl.set("#app-st1", { opacity: 0 }, 33.8);
+      tl.set("#app-st2", { opacity: 1 }, 33.8);
+      tl.set("#app-st2", { opacity: 0 }, 34.4);
+      tl.set("#app-st3", { opacity: 1 }, 34.4);
+      tl.to("#app-srow", { opacity: 0, duration: 0.15 }, 35.15);
+      tl.fromTo("#app-banner", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, 35.25);
+      tl.fromTo("#app-tbl", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 35.4);
+      [35.6, 36.1, 36.6, 37.1].forEach((at, i) => {
+        tl.fromTo("#app-tr" + (i + 1), { opacity: 0, x: AR ? -10 : 10 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, at);
+      });
+      const tf = focus(547, 407, 1.42);
+      tl.to("#app-cam", { ...tf, duration: 0.7, ease: "power2.inOut" }, 35.3);
+      tl.to("#app-cam", { ...HOME, duration: 0.5, ease: "power2.inOut" }, 37.8);
+
+      // ---------- Click spotlight on each thing the employee clicks ----------
+      function spot(x, y, rx, ry, inAt, outAt) {
+        const px = AR ? 840 - x : x;
+        tl.set("#app-spot", { "--sx": (px / 840 * 100).toFixed(2) + "%", "--sy": (y / 668 * 100).toFixed(2) + "%", "--srx": rx + "%", "--sry": ry + "%" }, inAt);
+        tl.fromTo("#app-spot", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out", immediateRender: false }, inAt);
+        tl.to("#app-spot", { opacity: 0, duration: 0.25, ease: "power2.in" }, outAt);
+      }
+      spot(315, 421, 18, 8, 10.35, 11.75);   // Yes
+      spot(358, 517, 16, 8, 19.7, 20.7);     // Print Test Ticket
+      spot(331, 517, 12, 8, 21.85, 22.7);    // Print
+      spot(358, 517, 16, 8, 30.15, 31.0);    // Printed correctly
+      spot(359, 566, 15, 6, 31.8, 32.7);     // Check ticket software
+
+      // ---------- Leave ----------
+      tl.to("#app-view", { opacity: 0, scale: 0.97, filter: "blur(8px)", duration: 0.45, ease: "power2.in" }, 38.45);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["app"] = tl;
+    })();
+  </script>
+</template>
