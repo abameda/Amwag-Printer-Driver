@@ -13,7 +13,7 @@
 ![UI](https://img.shields.io/badge/UI-WinForms-1f3a68)
 ![Languages](https://img.shields.io/badge/languages-English%20%7C%20العربية-f5a623)
 ![Tests](https://img.shields.io/badge/tests-4%2C524%20passing-2ea44f)
-![Version](https://img.shields.io/badge/version-1.0.0-informational)
+![Version](https://img.shields.io/badge/version-1.2.0-informational)
 
 <img src="docs/images/hero.png" alt="AMWAG Printer Setup" width="820" />
 
@@ -83,7 +83,9 @@ and 60-second walkthroughs in [English](promo-video/AMWAG-Printer-Setup-Training
    .\build.ps1
    ```
 
-   → `dist\AMWAG Printer Setup\` plus a versioned zip.
+   → `dist\AMWAG Printer Setup\` plus two versioned zips: the full offline package with the driver archives, and a
+   much smaller `-online` package without them (a PC downloads the approved driver from its official URL when it needs
+   one, so it needs internet access then).
 5. **Run the [hardware acceptance checklist](docs/HARDWARE-ACCEPTANCE-CHECKLIST.md)** on real printers.
 
 ## Command line
@@ -140,7 +142,7 @@ published exe is self-contained.
 dotnet test AmwagPrinterSetup.sln --filter "Category!=Screenshots"
 ```
 
-* **4,524 tests**, all passing (Core 643 · Windows 513 · App 3,368), 0 build warnings.
+* **4,701 tests**, all passing (Core 675 · Windows 517 · App 3,509), 0 build warnings.
 * `Category=WindowsIntegration` tests call real Windows APIs **read-only**. No test changes the PC's printers,
   drivers, forms, ports or services.
 * `Category=Screenshots` renders every screen in English and Arabic for design review.

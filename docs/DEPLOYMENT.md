@@ -11,6 +11,16 @@ AMWAG Printer Setup\
   README.md, SHA256SUMS.txt
 ```
 
+`build.ps1` zips this folder twice:
+
+* `AMWAG-Printer-Setup-<version>-win-x64.zip`: everything, including the driver archives (about 330 MB of the
+  package). The archives are already compressed, so no zip setting makes them smaller. Use it where a branch has no
+  reliable internet access.
+* `AMWAG-Printer-Setup-<version>-win-x64-online.zip`: the same without `drivers\`, about 50 MB. A PC that needs a
+  driver downloads the approved archive from its official URL (150–180 MB, once per PC) and checks its size, SHA-256
+  and signature before using it. Kyocera's download URL carries no version: if Kyocera replaces that file, the download
+  is refused and a branch with an FS-2100 needs the full package.
+
 Optional per-branch file: `branch.json` next to the exe, or in `%ProgramData%\AMWAG\PrinterSetup\branch.json`.
 
 **Which configuration is used.** `build.ps1` builds the configuration into the exe. `amwag-printer-config.json` and

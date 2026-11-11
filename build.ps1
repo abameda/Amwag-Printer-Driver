@@ -9,8 +9,10 @@
     4. Copies the deployment configuration and every approved offline driver archive found in .\drivers
        after re-checking its size and SHA-256 against the manifest (a mismatching archive stops the build).
     5. Copies the IT documentation, writes SHA256SUMS.txt and zips the distribution folder.
+    6. Zips it once more without the driver archives: the much smaller online package.
 
-    Output: .\dist\AMWAG Printer Setup\  and  .\dist\AMWAG-Printer-Setup-<version>-win-x64.zip
+    Output: .\dist\AMWAG Printer Setup\,  .\dist\AMWAG-Printer-Setup-<version>-win-x64.zip  (offline, with drivers)
+            and  .\dist\AMWAG-Printer-Setup-<version>-win-x64-online.zip  (drivers downloaded when a PC needs one)
 
 .EXAMPLE
     .\build.ps1
@@ -104,16 +106,40 @@ foreach ($doc in 'DEPLOYMENT.md', 'TROUBLESHOOTING.md', 'HARDWARE-ACCEPTANCE-CHE
     if (Test-Path $path) { Copy-Item $path -Destination $docsTarget }
 }
 
-$sums = Get-ChildItem $stage -Recurse -File | Sort-Object FullName | ForEach-Object {
-    $relative = $_.FullName.Substring($stage.Length + 1)
-    "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash, $relative
+function Write-Checksums([string] $Folder) {
+    $sums = Get-ChildItem $Folder -Recurse -File | Where-Object Name -ne 'SHA256SUMS.txt' | Sort-Object FullName | ForEach-Object {
+        $relative = $_.FullName.Substring($Folder.Length + 1)
+        "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash, $relative
+    }
+    Set-Content -Path (Join-Path $Folder 'SHA256SUMS.txt') -Value $sums -Encoding UTF8
 }
-Set-Content -Path (Join-Path $stage 'SHA256SUMS.txt') -Value $sums -Encoding UTF8
 
+function Get-SizeText([string] $Path) { "$([math]::Round((Get-Item $Path).Length / 1MB, 1)) MB" }
+
+Write-Checksums $stage
 $zip = Join-Path $dist "AMWAG-Printer-Setup-$version-win-x64.zip"
 Compress-Archive -Path $stage -DestinationPath $zip
 
+# The driver archives are already compressed, so they stay most of the full package whatever the zip settings. The online
+# package leaves them out: a PC that needs a driver downloads the approved archive from its official URL and checks its
+# size, SHA-256 and signature first, so it needs internet access then. Kyocera's URL carries no version: if Kyocera
+# replaces that file, the download is refused and the branch needs the full package (see docs\DRIVER-MANIFEST.md).
+$onlineZip = $null
+if ((Test-Path (Join-Path $stage 'drivers')) -and $config.driverSource.allowOnlineDownload) {
+    $onlineRoot = Join-Path $dist 'online'
+    $onlineStage = Join-Path $onlineRoot 'AMWAG Printer Setup'
+    New-Item -ItemType Directory -Force -Path $onlineStage | Out-Null
+    Get-ChildItem $stage | Where-Object Name -notin 'drivers', 'SHA256SUMS.txt' | Copy-Item -Destination $onlineStage -Recurse
+    Write-Checksums $onlineStage
+    $onlineZip = Join-Path $dist "AMWAG-Printer-Setup-$version-win-x64-online.zip"
+    Compress-Archive -Path $onlineStage -DestinationPath $onlineZip
+    Remove-Item -Recurse -Force $onlineRoot
+}
+
 $exe = Get-Item (Join-Path $stage 'AMWAG Printer Setup.exe')
 Write-Host ""
-Write-Host "Executable : $($exe.FullName) ($([math]::Round($exe.Length / 1MB, 1)) MB)" -ForegroundColor Green
-Write-Host "Package    : $zip" -ForegroundColor Green
+Write-Host "Executable : $($exe.FullName) ($(Get-SizeText $exe.FullName))" -ForegroundColor Green
+Write-Host "Package    : $zip ($(Get-SizeText $zip), offline: includes the driver archives)" -ForegroundColor Green
+if ($onlineZip) {
+    Write-Host "Online     : $onlineZip ($(Get-SizeText $onlineZip), downloads the approved driver when a PC needs one)" -ForegroundColor Green
+}
