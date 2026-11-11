@@ -16,7 +16,9 @@ public sealed partial class MainForm : Form
     private readonly ViewContext _context;
     private readonly Label _title;
     private readonly Label _subtitle;
+    private readonly ActionButton? _contactIt;
     private readonly ActionButton _language;
+    private readonly TableLayoutPanel _root;
     private readonly StepList _steps;
     private readonly Panel _host;
     private readonly FooterBar _footer;
@@ -50,6 +52,15 @@ public sealed partial class MainForm : Form
         _subtitle = new Label { AutoSize = true, Font = Theme.HeaderSubtitle, ForeColor = Theme.OnNavySecondary, BackColor = Color.Transparent, Margin = s.Pad(0, 2, 0, 0), UseMnemonic = false };
         _language = new ActionButton(ButtonKind.OnDark, s) { Anchor = AnchorStyles.None, Margin = Padding.Empty, MinimumSize = new Size(s.Px(88), s.Px(32)) };
         _language.Click += (_, _) => SwitchLanguage();
+        var headerActions = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = false, Anchor = AnchorStyles.None, Margin = Padding.Empty, Padding = Padding.Empty };
+        // Contact IT is offered only when the configuration names IT Department members to write to.
+        if (runtime.Environment.Config.ItContacts.Count > 0)
+        {
+            _contactIt = new ActionButton(ButtonKind.OnDark, s) { Anchor = AnchorStyles.None, Margin = s.Pad(0, 0, 8, 0), MinimumSize = new Size(s.Px(88), s.Px(32)) };
+            _contactIt.Click += (_, _) => ContactIt();
+            headerActions.Controls.Add(_contactIt);
+        }
+        headerActions.Controls.Add(_language);
 
         var titles = Ui.Stack();
         titles.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -73,7 +84,7 @@ public sealed partial class MainForm : Form
         header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         header.Controls.Add(new HeaderMark(new Size(s.Px(104), s.Px(30))) { Anchor = AnchorStyles.None, Margin = s.Pad(0, 0, 16, 0) }, 0, 0);
         header.Controls.Add(titles, 1, 0);
-        header.Controls.Add(_language, 2, 0);
+        header.Controls.Add(headerActions, 2, 0);
 
         _steps = new StepList(_context.Strings) { Dock = DockStyle.Fill, Margin = Padding.Empty };
         _host = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Background, Margin = Padding.Empty };
@@ -87,15 +98,15 @@ public sealed partial class MainForm : Form
 
         _footer = new FooterBar(s, runtime.Log);
 
-        var root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Margin = Padding.Empty, Padding = Padding.Empty };
-        root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, s.Px(36)));
-        root.Controls.Add(header, 0, 0);
-        root.Controls.Add(body, 0, 1);
-        root.Controls.Add(_footer, 0, 2);
-        Controls.Add(root);
+        _root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Margin = Padding.Empty, Padding = Padding.Empty };
+        _root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        _root.RowStyles.Add(new RowStyle(SizeType.Absolute, s.Px(36)));
+        _root.Controls.Add(header, 0, 0);
+        _root.Controls.Add(body, 0, 1);
+        _root.Controls.Add(_footer, 0, 2);
+        Controls.Add(_root);
 
         ApplyLanguage(language);
         ResumeLayout(false);
@@ -113,6 +124,8 @@ public sealed partial class MainForm : Form
     internal ViewBase? CurrentView => _view;
 
     internal StepList Steps => _steps;
+
+    internal ActionButton? ContactItButton => _contactIt;
 
     protected override void OnShown(EventArgs e)
     {
@@ -137,6 +150,11 @@ public sealed partial class MainForm : Form
         _subtitle.Text = T.ModeSubtitle(_mode);
         _language.Text = rtl ? "English" : "العربية";
         _language.AccessibleName = T.Text("header.language.accessible");
+        if (_contactIt is not null)
+        {
+            _contactIt.Text = T.Text("header.contactIt");
+            _contactIt.AccessibleName = T.Text("header.contactIt.accessible");
+        }
         _steps.SetStrings(T);
         _footer.SetStrings(T);
         _view?.Localize();
@@ -191,10 +209,11 @@ public sealed partial class MainForm : Form
         return MessageBox.Show(this, text, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, options) == DialogResult.Yes;
     }
 
-    private void ShowMessage(string text, MessageBoxIcon icon)
+    /// <param name="owner">The window the message belongs to: a dialog open over this one, or null for this window.</param>
+    private void ShowMessage(string text, MessageBoxIcon icon, IWin32Window? owner = null)
     {
         var options = T.IsRightToLeft ? MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign : 0;
-        MessageBox.Show(this, text, WindowTitle, MessageBoxButtons.OK, icon, MessageBoxDefaultButton.Button1, options);
+        MessageBox.Show(owner ?? this, text, WindowTitle, MessageBoxButtons.OK, icon, MessageBoxDefaultButton.Button1, options);
     }
 
     /// <summary>The "Stop the setup?" question when the window is closed during a run; null asks with a message box (tests answer it themselves).</summary>

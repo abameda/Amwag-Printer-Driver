@@ -19,6 +19,9 @@ public sealed record DeploymentConfig
     public IReadOnlyList<ModelDefinition> Models { get; init; } = [];
     public IReadOnlyList<DriverPackageDefinition> DriverPackages { get; init; } = [];
 
+    /// <summary>The IT Department members the window's Contact IT button offers; with none the button is not shown.</summary>
+    public IReadOnlyList<ItContact> ItContacts { get; init; } = [];
+
     public ModelDefinition? FindModel(string? id) =>
         id is null ? null : Models.FirstOrDefault(m => string.Equals(m.Id, id, StringComparison.OrdinalIgnoreCase));
 
@@ -208,6 +211,19 @@ public sealed record DriverPackageDefinition
     public string? ApprovedBy { get; init; }
     public string? VerifiedOn { get; init; }
     public string? Notes { get; init; }
+}
+
+/// <summary>An IT Department member an employee can send a picture of the window and the log to on WhatsApp.</summary>
+public sealed record ItContact
+{
+    public string Name { get; init; } = "";
+    public string NameArabic { get; init; } = "";
+
+    /// <summary>
+    /// The WhatsApp number in international format as https://wa.me/ takes it: digits only, country code first, without "+",
+    /// spaces or the national leading zero (Egypt's 0106 192 2226 is "201061922226").
+    /// </summary>
+    public string WhatsApp { get; init; } = "";
 }
 
 /// <summary>Optional per-branch file (branch.json). It cannot change ticket dimensions.</summary>

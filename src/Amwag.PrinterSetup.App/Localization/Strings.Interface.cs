@@ -8,6 +8,17 @@ public sealed partial class Strings
         c.Add("header.subtitle.Repair", "Checks and repairs the ticket printer settings", "فحص إعدادات طابعة التذاكر وإصلاحها");
         c.Add("header.subtitle.Diagnostics", "Checks the ticket printer without changing anything", "فحص طابعة التذاكر دون تغيير أي شيء");
         c.Add("header.language.accessible", "Switch the language to Arabic", "تغيير اللغة إلى الإنجليزية");
+        c.Add("header.contactIt", "Contact IT", "تواصل مع الدعم الفني");
+        c.Add("header.contactIt.accessible", "Contact the IT Department on WhatsApp", "التواصل مع إدارة تكنولوجيا المعلومات عبر واتساب");
+        c.Add("contact.title", "Contact the IT Department", "التواصل مع إدارة تكنولوجيا المعلومات");
+        c.Add("contact.text", "A picture of this window and the setup log will be prepared for WhatsApp. Who should receive them?", "سيتم تجهيز صورة لهذه النافذة وسجل الإعداد لإرسالهما عبر واتساب. إلى من تريد إرسالهما؟");
+        c.Add("contact.sent.title", "Finish in WhatsApp", "أكمل الإرسال في واتساب");
+        c.Add("contact.sent.text", "WhatsApp is opening a chat with {0}, with the message already written. In the chat, press Ctrl+V to attach the picture and the log, then press Send.", "يجري فتح محادثة واتساب مع {0} والرسالة مكتوبة بالفعل. في المحادثة، اضغط Ctrl+V لإرفاق الصورة والسجل، ثم اضغط «إرسال».");
+        c.Add("contact.sent.note", "If your browser opens first, choose to continue to the chat in WhatsApp. If the files are not attached, choose Show files and drag both files into the chat.", "إذا فُتح المتصفح أولًا، فاختر متابعة المحادثة في واتساب. وإذا لم تُرفق الملفات، فاختر «عرض الملفات» واسحب الملفين إلى المحادثة.");
+        c.Add("contact.showFiles", "Show files", "عرض الملفات");
+        c.Add("contact.done", "Done", "تم");
+        c.Add("contact.prepareFailed", "The picture and the log could not be prepared: {0}", "تعذّر تجهيز الصورة والسجل: {0}");
+        c.Add("contact.openFailed", "WhatsApp could not be opened. Choose Show files and send both files on WhatsApp to {0} at {1}.", "تعذّر فتح واتساب. اختر «عرض الملفات» وأرسل الملفين عبر واتساب إلى {0} على الرقم {1}.");
         c.Add("steps.accessible", "Setup steps", "خطوات الإعداد");
         // The company's own Arabic trade name replaces "AMWAG Travel" in its copyright line.
         c.Add("footer.copyright", "© 2026 AMWAG Travel · AMWAG IT Department", "© 2026 أمواج ترافيل · إدارة تكنولوجيا المعلومات");

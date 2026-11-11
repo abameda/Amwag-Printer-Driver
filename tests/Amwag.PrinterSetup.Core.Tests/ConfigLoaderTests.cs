@@ -68,7 +68,22 @@ public sealed class ConfigLoaderTests : IDisposable
         { "absolute inf", c => EditPackage(c, p => p with { InfPath = @"C:\x.inf" }), "without '..'" },
         { "no signers", c => EditPackage(c, p => p with { TrustedSigners = [] }), "trustedSigners" },
         { "wrong environment", c => EditPackage(c, p => p with { Environment = "Windows ARM64" }), "environment must be" },
+        { "null IT contacts", c => c with { ItContacts = null! }, "itContacts must not be null" },
+        { "IT contact without name", c => WithContact(c, k => k with { Name = " " }), "itContacts[0].name must not be empty" },
+        { "IT contact without Arabic name", c => WithContact(c, k => k with { NameArabic = "" }), "nameArabic must not be empty" },
+        { "WhatsApp number with plus", c => WithContact(c, k => k with { WhatsApp = "+201061922226" }), "whatsApp must be the number in international format" },
+        { "WhatsApp number in national form", c => WithContact(c, k => k with { WhatsApp = "01061922226" }), "whatsApp must be the number in international format" },
+        { "WhatsApp number with spaces", c => WithContact(c, k => k with { WhatsApp = "20 106 192 2226" }), "whatsApp must be the number in international format" },
+        { "WhatsApp number too short", c => WithContact(c, k => k with { WhatsApp = "2010619" }), "whatsApp must be the number in international format" },
+        { "WhatsApp number too long", c => WithContact(c, k => k with { WhatsApp = "2010619222261234" }), "whatsApp must be the number in international format" },
     };
+
+    [Fact]
+    public void IT_contacts_are_optional_and_a_valid_one_is_accepted()
+    {
+        Assert.Empty(SampleConfig.Create().ItContacts);
+        Assert.Empty(ConfigLoader.Validate(WithContact(SampleConfig.Create(), k => k)));
+    }
 
     [Theory]
     [MemberData(nameof(InvalidConfigurations))]
@@ -358,6 +373,9 @@ public sealed class ConfigLoaderTests : IDisposable
         Assert.Equal(1, config.SchemaVersion);
         Assert.Equal("AMWAG Ticket", config.Ticket.FormName);
         Assert.Equal(new PaperDimensions(83_058, 170_180), config.Ticket.Dimensions);
+        Assert.Equal(
+            [("Eng. Abdelhmeed Elshorbagy", "201061922226"), ("Eng. Abdelrhman Elshorbagy", "201011955580")],
+            config.ItContacts.Select(c => (c.Name, c.WhatsApp)));
     }
 
     [Fact]
@@ -384,4 +402,7 @@ public sealed class ConfigLoaderTests : IDisposable
 
     private static DeploymentConfig EditPackage(DeploymentConfig config, Func<DriverPackageDefinition, DriverPackageDefinition> edit) =>
         config with { DriverPackages = [edit(config.DriverPackages[0]), .. config.DriverPackages.Skip(1)] };
+
+    private static DeploymentConfig WithContact(DeploymentConfig config, Func<ItContact, ItContact> edit) =>
+        config with { ItContacts = [edit(new ItContact { Name = "Eng. Test Contact", NameArabic = "م. اختبار", WhatsApp = "201061922226" })] };
 }

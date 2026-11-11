@@ -125,7 +125,7 @@ internal static class TestRuntime
         ],
     };
 
-    public static AppRuntime Create(string? language = null, SetupMode mode = SetupMode.Setup, IPrintSpooler? spooler = null, ILog? log = null, CommandLineOptions? commandLine = null)
+    public static AppRuntime Create(string? language = null, SetupMode mode = SetupMode.Setup, IPrintSpooler? spooler = null, ILog? log = null, CommandLineOptions? commandLine = null, DeploymentConfig? config = null)
     {
         log ??= new MemoryLog();
         var services = new SetupServices
@@ -140,7 +140,7 @@ internal static class TestRuntime
             Clock = new ManualClock(),
         };
         var options = new SetupOptions { Mode = mode, AppVersion = "1.0.0", ConfigSource = "test" };
-        var environment = new FlowEnvironment(Config, null, options, services);
+        var environment = new FlowEnvironment(config ?? Config, null, options, services);
         return new AppRuntime(environment, new NeverElevate(), commandLine ?? new CommandLineOptions { Mode = mode, Language = language }, log, "1.0.0", AppContext.BaseDirectory);
     }
 }

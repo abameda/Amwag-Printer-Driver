@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "configVersion": "2026.11.10-1",
+  "configVersion": "2026.11.10-2",
   "ticket": {
     "formName": "AMWAG Ticket",
     "width": 3.27,
@@ -32,6 +32,10 @@
     "allowOnlineDownload": true,
     "downloadTimeoutSeconds": 900
   },
+  "itContacts": [
+    { "name": "Eng. Abdelhmeed Elshorbagy", "nameArabic": "م. عبدالحميد الشوربجي", "whatsApp": "201061922226" },
+    { "name": "Eng. Abdelrhman Elshorbagy", "nameArabic": "م. عبدالرحمن الشوربجي", "whatsApp": "201011955580" }
+  ],
   "models": [
     {
       "id": "P-4030DN",

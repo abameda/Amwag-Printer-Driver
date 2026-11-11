@@ -25,6 +25,11 @@ internal static class AppPaths
 
     public static string UserReportsDirectory => Path.Combine(UserBase, "AMWAG", "PrinterSetup", "Reports");
 
+    /// <summary>The pictures and log archives the Contact IT button prepares (Users can read them there, so WhatsApp can attach them).</summary>
+    public static string SupportDirectory => Path.Combine(DataRoot, "Support");
+
+    public static string UserSupportDirectory => Path.Combine(UserBase, "AMWAG", "PrinterSetup", "Support");
+
     /// <summary>Where this process may write logs, in order of preference.</summary>
     public static (string Base, string Directory)[] LogLocations =>
         Environment.IsPrivilegedProcess
@@ -36,6 +41,19 @@ internal static class AppPaths
         Environment.IsPrivilegedProcess
             ? [(MachineBase, ReportsDirectory), (UserBase, UserReportsDirectory)]
             : [(UserBase, UserReportsDirectory)];
+
+    /// <summary>Where this process may write the Contact IT files, in order of preference.</summary>
+    public static (string Base, string Directory)[] SupportLocations =>
+        Environment.IsPrivilegedProcess
+            ? [(MachineBase, SupportDirectory), (UserBase, UserSupportDirectory)]
+            : [(UserBase, UserSupportDirectory)];
+
+    /// <summary>
+    /// Folders that may hold this session's logs. An elevated process leaves out the employee's own folder: a link planted there
+    /// under a log's name would make it read, and hand over, a file only administrators may read.
+    /// </summary>
+    public static string[] SessionLogDirectories =>
+        Environment.IsPrivilegedProcess ? [LogsDirectory] : [LogsDirectory, UserLogsDirectory];
 
     /// <summary>
     /// Prepares a log or report folder: below %ProgramData% every level is secured for administrators

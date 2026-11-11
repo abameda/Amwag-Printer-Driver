@@ -138,8 +138,38 @@ public static class ConfigLoader
         else
             CheckModels(config, errors, warnings);
 
+        if (config.ItContacts is null)
+            errors.Add("itContacts must not be null.");
+        else
+            CheckItContacts(config.ItContacts, errors);
+
         return (errors, warnings);
     }
+
+    private static void CheckItContacts(IReadOnlyList<ItContact> contacts, List<string> errors)
+    {
+        for (int i = 0; i < contacts.Count; i++)
+        {
+            var contact = contacts[i];
+            if (contact is null)
+            {
+                errors.Add(Inv($"itContacts[{i}] must not be null."));
+                continue;
+            }
+
+            string label = Inv($"itContacts[{i}] ('{contact.Name}')");
+            if (string.IsNullOrWhiteSpace(contact.Name))
+                errors.Add(Inv($"itContacts[{i}].name must not be empty."));
+            if (string.IsNullOrWhiteSpace(contact.NameArabic))
+                errors.Add($"{label}: nameArabic must not be empty.");
+            if (!IsInternationalPhoneNumber(contact.WhatsApp))
+                errors.Add($"{label}: whatsApp must be the number in international format: 8 to 15 digits, country code first, without '+', spaces or a leading zero (e.g. 201061922226).");
+        }
+    }
+
+    /// <summary>An E.164 number written as https://wa.me/ takes it: digits only, starting with the country code.</summary>
+    private static bool IsInternationalPhoneNumber(string? value) =>
+        value is { Length: >= 8 and <= 15 } && value[0] != '0' && value.All(char.IsAsciiDigit);
 
     private static void CheckTicket(TicketPaperConfig ticket, List<string> errors, List<string> warnings)
     {

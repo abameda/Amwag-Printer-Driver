@@ -17,7 +17,7 @@ public sealed partial class StringsTests
     private static partial Regex Placeholder();
 
     // Any literal that looks like a catalog key, except log event names (which share the "ui." and "testprint." prefixes).
-    [GeneratedRegex(@"(?<!\b(?:Info|Warn|Error|Debug|Write)\(\s*)""((?:ui|header|steps|progress|card|value|connection|confidence|choose|confirm|network|model|close|result|testprint|ticketcheck|step|phase|action|finding|outcome|check|status)\.[A-Za-z0-9_.]+)""")]
+    [GeneratedRegex(@"(?<!\b(?:Info|Warn|Error|Debug|Write)\(\s*)""((?:ui|header|steps|progress|card|value|connection|confidence|choose|confirm|contact|network|model|close|result|testprint|ticketcheck|step|phase|action|finding|outcome|check|status)\.[A-Za-z0-9_.]+)""")]
     private static partial Regex KeyUse();
 
     public static TheoryData<string> AllKeys()

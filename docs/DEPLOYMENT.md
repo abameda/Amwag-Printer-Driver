@@ -73,6 +73,7 @@ which includes reading permissions, on every folder of the path.
 | | `identifyExistingNetworkQueues`, `maxNetworkProbes`, `networkTimeoutMilliseconds` | One SNMP query per relevant address; no subnet scanning. |
 | | `usbQueueWaitSeconds` | How long to wait for Windows to create the USB queue after installing the driver. |
 | `driverSource` | `offlineFolder` (`drivers`), `allowOnlineDownload`, `downloadTimeoutSeconds` | Offline folder may be absolute or a UNC path. |
+| `itContacts[]` | `name`, `nameArabic`, `whatsApp` | IT Department members offered by the **Contact IT** button in the window's header (no entries: no button). `whatsApp` is the number in international format, digits only, without `+` or the leading zero (`01061922226` in Egypt is `201061922226`). See section 6. |
 | `models[]` | `id`, `displayName`, `hardwareIds`, `ieee1284Ids`, `networkModelNames`, `acceptedDrivers`, `preferredDriverName`, `driverPackageId`, `ticketPaperSource`, `multipurposeTrayRange`, `cassetteRange` | Supported models. New models are added here, without code changes, once their INF data is verified. |
 | `models[].acceptedDrivers[]` | `name`, `minVersion`, `listsWindowsForms` (default `true`) | Drivers a queue may keep. `listsWindowsForms: false` marks a driver that ignores Windows forms and offers only its own paper list (the KX v3 `P-xxxx KX` drivers, measured at a branch).<br>A queue on such a driver is always moved to the preferred driver, also when a custom page size of the ticket size was made in it: that paper has another name, and may exist for one Windows account only. If the ticket defaults then fail, the queue gets its driver and defaults back.<br>A new queue never uses such a driver.<br>The preferred driver must list Windows forms. |
 | `driverPackages[]` | `id`, `version`, `downloadUrl`, `fileName`, `sizeBytes`, `sha256`, `infPath`, `catalogPath`, `trustedSigners`, `approved` | Approved driver manifest. Downloads are allowed only from official TA/UTAX/Kyocera HTTPS hosts. `approved: false` or a `minOsBuild` above the PC's build stops the run only when the driver must be installed from the package; with an approved driver already installed, the USB device keeps its driver (a warning) and the queue and defaults are configured. |
@@ -225,6 +226,14 @@ success it shows the printer, driver, connection and ticket size, and offers **P
 Language: Arabic or English follows Windows; the button in the header switches at any time (`--lang ar|en`
 forces one).
 
+**Contact IT** (header, shown when `itContacts` lists anyone): the employee chooses an IT Department member. The tool
+saves a picture of the window as it was and a zip with this session's logs (the window's and the administrator
+helper's), the diagnostic report when a run made one, and a summary. It puts both files on the clipboard and opens
+`https://wa.me/<number>` with the summary already typed (branch, computer, version, mode, result and session id). In
+WhatsApp the employee presses **Ctrl+V** to attach the files and then **Send**; the tool itself sends nothing. If the
+files are not attached, **Show files** opens their folder for dragging them into the chat. The Business API is not used:
+no account or secret key is shipped.
+
 ## 7. Command line
 
 ```
@@ -316,6 +325,7 @@ printer; other supported printers do not change its exit code.
 | `%LOCALAPPDATA%\AMWAG\PrinterSetup\Logs` | JSON-lines logs of the employee's (unelevated) window, kept 60 days. |
 | `%ProgramData%\AMWAG\PrinterSetup\Logs` | Logs of the elevated worker and of silent/IT runs. |
 | `%ProgramData%\AMWAG\PrinterSetup\Reports` | Reports from silent runs (per-user folder when not elevated). |
+| `%LOCALAPPDATA%\AMWAG\PrinterSetup\Support` | Pictures and log archives prepared by **Contact IT** (`%ProgramData%\AMWAG\PrinterSetup\Support` when the window runs elevated). Not deleted automatically. |
 | `%ProgramData%\AMWAG\PrinterSetup\DriverCache`, `Packages` | Verified driver archive and the extracted x64 driver folder. |
 
 Only elevated processes create or write anything under `%ProgramData%\AMWAG`. They secure every level of that folder

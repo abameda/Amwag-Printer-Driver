@@ -2,9 +2,11 @@ using System.Drawing.Imaging;
 using System.Reflection;
 using Amwag.PrinterSetup.App.Flow;
 using Amwag.PrinterSetup.App.Localization;
+using Amwag.PrinterSetup.App.Support;
 using Amwag.PrinterSetup.App.TestTicket;
 using Amwag.PrinterSetup.App.UI;
 using Amwag.PrinterSetup.App.UI.Views;
+using Amwag.PrinterSetup.Core.Configuration;
 using Amwag.PrinterSetup.Core.Setup;
 using Amwag.PrinterSetup.Core.Units;
 
@@ -259,6 +261,41 @@ public sealed class ScreenshotTests
         typeof(Button).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(toggle, [EventArgs.Empty]);
     }
 
+    private static readonly ItContact[] ItContacts =
+    [
+        new() { Name = "Eng. Abdelhmeed Elshorbagy", NameArabic = "م. عبدالحميد الشوربجي", WhatsApp = "201061922226" },
+        new() { Name = "Eng. Abdelrhman Elshorbagy", NameArabic = "م. عبدالرحمن الشوربجي", WhatsApp = "201011955580" },
+    ];
+
+    /// <summary>The window with the Contact IT button over a failed run, and the Contact IT dialog before and after choosing.</summary>
+    [Theory]
+    [MemberData(nameof(Languages))]
+    public void ContactIt(string language)
+    {
+        Render("contact-it-window", language, SetupMode.Setup, form => form.ShowResult(UiSamples.Failed()), config: TestRuntime.Config with { ItContacts = ItContacts });
+        Sta.Run(() =>
+        {
+            Application.EnableVisualStyles();
+            var strings = language == "ar" ? Strings.Arabic : Strings.English;
+            using var dialog = new ContactItDialog(strings, ItContacts, (_, _) => new SupportPackage("shot.png", "logs.zip"), _ => { });
+            Save(dialog, $"contact-it-choose-{language}.png");
+            typeof(Button).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(
+                dialog.Controls[0].Controls.Cast<Control>().SelectMany(c => c.Controls.Cast<Control>()).OfType<ActionButton>().First(), [EventArgs.Empty]);
+            Save(dialog, $"contact-it-sent-{language}.png");
+        });
+
+        static void Save(Form dialog, string file)
+        {
+            Directory.CreateDirectory(Output);
+            typeof(Control).GetMethod("CreateControl", BindingFlags.Instance | BindingFlags.NonPublic, [typeof(bool)])!.Invoke(dialog, [true]);
+            dialog.PerformLayout();
+            Application.DoEvents();
+            using var bitmap = new Bitmap(dialog.Width, dialog.Height);
+            dialog.DrawToBitmap(bitmap, new Rectangle(Point.Empty, dialog.Size));
+            bitmap.Save(Path.Combine(Output, file), ImageFormat.Png);
+        }
+    }
+
     /// <summary>The loading screen as the logo arrives (300 ms), once it has (1000 ms), mid-wave (2300 ms) and at rest.</summary>
     [Theory]
     [MemberData(nameof(Languages))]
@@ -277,11 +314,11 @@ public sealed class ScreenshotTests
     });
 
     /// <param name="height">Logical client height; taller than the real 636 px window to show content that otherwise scrolls (Windows caps it near the screen height).</param>
-    private static void Render(string name, string language, SetupMode mode, Action<MainForm> arrange, int height = 636) => Sta.Run(() =>
+    private static void Render(string name, string language, SetupMode mode, Action<MainForm> arrange, int height = 636, DeploymentConfig? config = null) => Sta.Run(() =>
     {
         Directory.CreateDirectory(Output);
         Application.EnableVisualStyles(); // as the app does at startup, so native controls look as they will
-        using var form = new MainForm(TestRuntime.Create(language, mode));
+        using var form = new MainForm(TestRuntime.Create(language, mode, config: config));
         if (height != 636)
             form.ClientSize = new Size(form.ClientSize.Width, form.LogicalToDeviceUnits(height));
         // Create every window handle (hidden): DrawToBitmap only paints children that have handles.
