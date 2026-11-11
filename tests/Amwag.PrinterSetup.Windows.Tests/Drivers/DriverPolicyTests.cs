@@ -15,6 +15,7 @@ public sealed class OfficialDownloadHostsTests
     [InlineData("https://utax.de/a.zip")]
     [InlineData("https://www.utax.it/a.zip")]
     [InlineData("https://www.kyoceradocumentsolutions.com/a.zip")]
+    [InlineData("https://www.kyoceradocumentsolutions.eu/a.zip")]
     [InlineData("https://WWW.TRIUMPH-ADLER.COM/a.zip")]
     [InlineData("https://www.triumph-adler.com./a.zip")]
     public void OfficialHttpsHostsAreAllowed(string url) => Assert.True(OfficialDownloadHosts.IsAllowed(new Uri(url), out _));
@@ -26,6 +27,7 @@ public sealed class OfficialDownloadHostsTests
     [InlineData("https://triumph-adler.com.evil.net/a.zip")]
     [InlineData("https://www.triumph-adler.co/a.zip")]
     [InlineData("https://kyocera.com/a.zip")]
+    [InlineData("https://kyoceradocumentsolutions.eu.evil.net/a.zip")]
     [InlineData("https://203.0.113.10/a.zip")]
     [InlineData("https://[2001:db8::1]/a.zip")]
     [InlineData("https://user:secret@www.triumph-adler.com/a.zip")]

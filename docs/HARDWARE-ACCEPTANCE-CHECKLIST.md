@@ -15,7 +15,8 @@ result (Pass/Fail), and the log file names from `%LOCALAPPDATA%\AMWAG\PrinterSet
 - [ ] Driver manifest entries reviewed (version, SHA-256, signer) — see `docs\DRIVER-MANIFEST.md`.
 - [ ] Test PCs: one Windows 10 22H2 x64 and one Windows 11 (current release) x64, each with a standard employee
       account and an administrator account available.
-- [ ] Ticket stock, a ruler or caliper (0.5 mm resolution), one printer of each model: P-4030DN, P-4531DN, P-5032DN.
+- [ ] Ticket stock, a ruler or caliper (0.5 mm resolution), one printer of each model: P-4030DN, P-4531DN, P-5032DN,
+      FS-2100DN (and FS-2100D where a branch has one; it is USB-only without its optional network card).
 - [ ] Network details for each printer (IP address, SNMP community if not `public`).
 
 ## 1. Core scenarios (repeat for each model)
@@ -105,3 +106,5 @@ MP tray paper size on its panel, set the custom size there. Print **Test Ticket*
 | P-4030DN | | | | | |
 | P-4531DN | | | | | |
 | P-5032DN | | | | | |
+| FS-2100DN | | | | | |
+| FS-2100D | | n/a without network card | | n/a without network card | |

@@ -62,6 +62,41 @@ its x64 catalog is vendor-signed, so unattended installation needs IT to trust K
 2. In `models[]` set `preferredDriverName` to `P-xxxx KX` and `driverPackageId` to `ta-kx-8.7.0917`.
 3. Re-run the hardware acceptance checklist.
 
+## Kyocera FS-2100DN / FS-2100D (added 2026-11-10)
+
+The TA packages above contain only TA/UTAX hardware IDs, so the Kyocera-branded FS-2100 (the P-4030DN/P-4030D twin)
+needs Kyocera's own KXv4 package. Downloaded from the Kyocera Europe download centre, hashed and read; nothing was
+installed or executed.
+
+| | Kyocera KX v4 Printer Driver 6.2.2215 (PCL6 driver) |
+|---|---|
+| URL | `https://www.kyoceradocumentsolutions.eu/content/dam/download-center-cf/eu/drivers/all/Kxv4Driver_signed_zip.download.zip` (no redirect; served as `Kxv4Driver_signed.zip`) |
+| File / size | `Kxv4Driver_signed.zip`, 177 216 574 bytes |
+| SHA-256 | `A051995772043082A41E33E4E3C7D9DD197D7C852CC93B32D0360421B427BE83` |
+| x64 INF | `en/PrnDrv/PCL Driver/64bit/win81 and newer/prnkycl1.inf`, `[Kyocera.NTamd64]`, ClassVer 4.0 |
+| DriverVer | 10/15/2024, 6.2.2215.0 |
+| x64 catalog signer | **Microsoft Windows Hardware Compatibility Publisher (WHQL)**, timestamped, OS attribute `_v100_X64` |
+
+| Model | KXv4 driver names | KX v3 driver name (KX 6.2.1113 INF) | INF hardware IDs |
+|---|---|---|---|
+| FS-2100DN | `Kyocera FS-2100DN v4 KX (PCL6)`, `Kyocera FS-2100DN v4 KX (XPS)` | `Kyocera FS-2100DN KX` | `USBPRINT\`, `WSDPRINT\`, `LPTENUM\KyoceraFS-2100DNC23C` |
+| FS-2100D | `Kyocera FS-2100D v4 KX (PCL6)`, `Kyocera FS-2100D v4 KX (XPS)` | `Kyocera FS-2100D KX` | `USBPRINT\`, `WSDPRINT\`, `LPTENUM\KyoceraFS-2100D7D49` |
+
+* Each PCL6 manifest's `PrinterDriverID` matches its INF line (FS-2100DN `{79216a0e-2ec0-4520-89fd-a1562522f5a4}`).
+* `kmfs2100npcl6.gpd` is identical to TA's `utlp2100npcl6.gpd` (P-4030DN) except file name, version, model name and
+  bidi file; `kmfs2100pcl6.gpd` likewise to `utlp2100pcl6.gpd` (P-4030D), plus one optional-cassette constraint. So the
+  MP tray is the GPD option `Manual` (`dmDefaultSource = 4`) and custom sizes run from 70 × 148 to 216 × 356 mm.
+* Kyocera's operation guide (FS-2100D/2100DN/4100DN/4200DN/4300DN, Rev. 2, p. A-14/A-16) gives MP tray 70–216 ×
+  148–356 mm and, for the FS-2100D/DN, a cassette minimum of 140 × 210 mm: the ticket feeds from the MP tray only.
+* SNMP model ids from the vendor installer database (`KmInstall4.ini`): `FS-2100DN` (USB `VID_0482&PID_049d`),
+  `FS-2100D` (`PID_049c`). Not yet confirmed on hardware.
+* The download URL has no version in it. When Kyocera publishes a newer build at that URL, its SHA-256 stops matching and
+  the online download is refused (integrity check), so ship this archive in the distribution's `drivers` folder and
+  re-verify before changing the manifest. `kyoceradocumentsolutions.eu` was added to the official download hosts.
+* Kyocera also lists, for the FS-2100DN, "KX driver 6.2.1113" (a 2014 KX v3 driver, WHQL) and "KX Universal Printer
+  Driver 8.7.0422" (v3). Neither is used: KX v3 does not list Windows forms (see `research/kx-custom-paper-size.md`).
+  A queue already on `Kyocera FS-2100D(N) KX` is accepted and moved to the KXv4 driver like the TA models.
+
 ## Points that need real hardware
 
 * The Plug and Play IDs the printers actually report. KX's own installer database lists a second ID for some

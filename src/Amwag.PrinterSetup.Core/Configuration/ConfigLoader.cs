@@ -60,7 +60,7 @@ public static class ConfigLoader
     [
         "triumph-adler.com", "triumph-adler.de", "triumph-adler.net",
         "utax.com", "utax.de", "utax.it",
-        "kyoceradocumentsolutions.com",
+        "kyoceradocumentsolutions.com", "kyoceradocumentsolutions.eu",
     ];
 
     private static readonly JsonDocumentOptions DocumentOptions = new()

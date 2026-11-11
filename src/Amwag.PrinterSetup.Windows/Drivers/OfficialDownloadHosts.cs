@@ -12,6 +12,7 @@ internal static class OfficialDownloadHosts
         "utax.de",
         "utax.it",
         "kyoceradocumentsolutions.com",
+        "kyoceradocumentsolutions.eu",
     ];
 
     /// <summary>HTTPS, no user information, and a DNS host that is an official domain or one of its subdomains.</summary>

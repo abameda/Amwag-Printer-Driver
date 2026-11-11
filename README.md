@@ -23,7 +23,8 @@
 
 ## What it does
 
-AMWAG Travel branches print tickets on **TA Triumph-Adler P-4030DN, P-4531DN and P-5032DN** printers. Setting one up by
+AMWAG Travel branches print tickets on **TA Triumph-Adler P-4030DN, P-4531DN and P-5032DN** and **Kyocera FS-2100DN /
+FS-2100D** printers. Setting one up by
 hand means the right driver, a custom paper size, the right tray, portrait, single-sided, 100 % scale — and one wrong
 click prints a ticket that doesn't fit the stock.
 

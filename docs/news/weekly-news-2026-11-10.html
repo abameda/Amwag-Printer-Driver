@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Printer Setup Weekly</title>
+<style>
+  :root {
+    --navy: #0F2A4A;
+    --navy-raised: #22497A;
+    --navy-deep: #0B1F38;
+    --on-navy: #C9D5E6;
+    --amber: #F5B642;
+    --amber-soft: #FFF4DF;
+    --sky: #36A9E1;
+    --paper: #F2F4F5;
+    --card: #FFFFFF;
+    --ink: #15191D;
+    --ink-2: #56616B;
+    --line: #DCE1E5;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: "Segoe UI", "Segoe UI Variable Text", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; background: var(--paper); }
+  body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .page { width: 1080px; height: 1350px; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Masthead */
+  .mast { background: radial-gradient(120% 140% at 50% 0%, var(--navy-raised) 0%, var(--navy) 55%, var(--navy-deep) 100%); color: #fff; padding: 26px 64px 30px; position: relative; overflow: hidden; }
+  .mast::after { content: ""; position: absolute; left: -10%; right: -10%; bottom: -120px; height: 200px; border-radius: 50%; background: rgba(54, 169, 225, 0.08); }
+  .mast-top { display: flex; justify-content: space-between; font-size: 14px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--on-navy); padding-bottom: 14px; border-bottom: 1px solid rgba(245, 182, 66, 0.55); }
+  .mast-top b { color: var(--amber); font-weight: 600; }
+  .mast-main { display: flex; align-items: center; gap: 30px; padding-top: 22px; position: relative; z-index: 1; }
+  .mast-main img { height: 104px; }
+  .mast-title { font-family: var(--serif); font-size: 62px; font-weight: 700; letter-spacing: -0.01em; line-height: 1; }
+  .mast-title span { color: var(--amber); font-style: italic; font-weight: 400; }
+  .mast-sub { margin-top: 10px; font-size: 19px; color: var(--on-navy); }
+
+  /* Body */
+  .body { flex: 1; padding: 40px 64px 0; display: flex; flex-direction: column; }
+  .kicker { display: inline-flex; align-items: center; gap: 10px; align-self: flex-start; background: var(--amber); color: var(--navy); font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; padding: 8px 14px; border-radius: 4px; }
+  .kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy); display: inline-block; }
+  h1 { font-family: var(--serif); font-size: 58px; line-height: 1.06; color: var(--navy); margin-top: 18px; letter-spacing: -0.015em; }
+  h1 em { font-style: italic; color: var(--navy-raised); }
+  .lede { margin-top: 16px; font-size: 22px; line-height: 1.45; color: var(--ink-2); max-width: 920px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .section-label { margin-top: 42px; display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--navy); }
+  .section-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .printers { margin-top: 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .printer { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px 13px; position: relative; }
+  .printer .brand { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+  .printer .model { margin-top: 3px; font-size: 21px; font-weight: 700; color: var(--navy); }
+  .printer.new { background: var(--amber-soft); border: 2px solid var(--amber); padding: 11px 13px 12px; }
+  .printer.new .badge { position: absolute; top: -11px; right: 10px; background: var(--navy); color: var(--amber); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; padding: 3px 8px; border-radius: 3px; }
+
+  .grid { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px 20px; display: flex; gap: 16px; }
+  .icon { flex: none; width: 46px; height: 46px; border-radius: 10px; background: var(--navy); display: grid; place-items: center; }
+  .icon svg { width: 26px; height: 26px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .card h3 { font-size: 19px; color: var(--navy); line-height: 1.25; }
+  .card p { margin-top: 5px; font-size: 16px; line-height: 1.45; color: var(--ink-2); }
+
+  .stats { margin-top: 34px; background: var(--navy); border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); color: #fff; }
+  .stat { padding: 18px 24px; }
+  .stat + .stat { border-left: 1px solid rgba(201, 213, 230, 0.2); }
+  .stat b { display: block; font-family: var(--serif); font-size: 40px; line-height: 1; color: var(--amber); }
+  .stat span { display: block; margin-top: 6px; font-size: 15px; color: var(--on-navy); }
+
+  .next { margin-top: 24px; display: flex; align-items: center; gap: 18px; background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--sky); border-radius: 10px; padding: 16px 20px; }
+  .next .tag { flex: none; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #1A6E9E; }
+  .next p { font-size: 17px; line-height: 1.4; color: var(--ink); }
+
+  .foot { margin-top: auto; padding: 18px 64px 22px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--ink-2); border-top: 1px solid var(--line); }
+  .foot b { color: var(--navy); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="mast">
+    <div class="mast-top"><span>AMWAG Travel &middot; <b>IT update</b></span><span>Week of 10 November 2026</span></div>
+    <div class="mast-main">
+      <img src="../../branding/amwag-logo.svg" alt="AMWAG Travel">
+      <div>
+        <div class="mast-title">Printer Setup <span>Weekly</span></div>
+        <div class="mast-sub">What&rsquo;s new in AMWAG Printer Setup, the one-click ticket printer tool</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="body">
+    <div class="kicker"><i></i>New printer support</div>
+    <h1>The Kyocera FS-2100 joins the <em>ticket printer</em> lineup</h1>
+    <p class="lede">Branches with a <strong>Kyocera FS-2100DN</strong> or <strong>FS-2100D</strong> can now set up their ticket printer with AMWAG Printer Setup, the same way as the TA Triumph-Adler models.</p>
+
+    <div class="section-label">Supported ticket printers &middot; now 5 models</div>
+    <div class="printers">
+      <div class="printer"><div class="brand">TA Triumph-Adler</div><div class="model">P-4030DN</div></div>
+      <div class="printer"><div class="brand">TA Triumph-Adler</div><div class="model">P-4531DN</div></div>
+      <div class="printer"><div class="brand">TA Triumph-Adler</div><div class="model">P-5032DN</div></div>
+      <div class="printer new"><span class="badge">NEW</span><div class="brand">Kyocera</div><div class="model">FS-2100DN</div></div>
+      <div class="printer new"><span class="badge">NEW</span><div class="brand">Kyocera</div><div class="model">FS-2100D</div></div>
+    </div>
+
+    <div class="section-label">What&rsquo;s in this update</div>
+    <div class="grid">
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+        <div><h3>Microsoft-certified Kyocera driver</h3><p>Kyocera KX v4 driver 6.2.2215, signed by Microsoft, so Windows installs it without extra warnings.</p></div>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
+        <div><h3>Inside the package, no download</h3><p>The driver ships with the tool. Size, SHA-256 and signature are checked before every install.</p></div>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M7 3h10v18l-2.5-1.5L12 21l-2.5-1.5L7 21V3z"/><path d="M10 8h4M10 12h4"/></svg></div>
+        <div><h3>Ticket settings applied for you</h3><p>AMWAG Ticket 3.27 &times; 6.70 in from the MP tray: portrait, single-sided, 100 % scale.</p></div>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/></svg></div>
+        <div><h3>Older drivers upgraded automatically</h3><p>PCs on the old Kyocera KX v3 driver are switched to v4, which accepts the ticket size.</p></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b>4,621</b><span>automated tests passing</span></div>
+      <div class="stat"><b>5</b><span>printer models supported</span></div>
+      <div class="stat"><b>2</b><span>certified drivers bundled offline</span></div>
+    </div>
+
+    <div class="next">
+      <div class="tag">Next up</div>
+      <p>On-site test at a branch with a Kyocera FS-2100, then sign-off on the hardware checklist before rollout to all branches.</p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span><b>AMWAG Printer Setup 1.0.0</b> &middot; configuration 2026.11.10-1</span>
+    <span>AMWAG Travel IT</span>
+  </footer>
+</div>
+</body>
+</html>

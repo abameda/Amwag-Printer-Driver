@@ -85,6 +85,7 @@ public sealed class ConfigLoaderTests : IDisposable
     [InlineData("https://www.utax.com/x.zip")]
     [InlineData("https://utax.it/x.zip")]
     [InlineData("https://download.kyoceradocumentsolutions.com/x.zip")]
+    [InlineData("https://www.kyoceradocumentsolutions.eu/content/dam/download-center-cf/eu/drivers/all/Kxv4Driver_signed_zip.download.zip")]
     [InlineData("https://triumph-adler.de/x.zip")]
     public void Official_download_hosts_are_accepted(string url)
     {

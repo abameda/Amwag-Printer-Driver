@@ -51,6 +51,9 @@ confirmed on each model (hardware acceptance checklist).
   https://www.triumph-adler.com/caas/v1/ta/media/113522/data/0015e7165caacac98da7cc71fa6d0b6b/IH_P-4531DN_P-5031DN_P-5531DN_P-6031DN_TA_UK.pdf
 * TA English OG P-4532DN/P-5032DN/P-5532DN Rev 1:
   https://www.triumph-adler.com/caas/v1/ta/media/113636/data/d9395b434f59131c3bde688e252769ab/EN_IH_P-4532DN_P-5032DN_P-5532DN_TA_Rev_1.pdf
+* Kyocera English OG FS-2100D/2100DN/4100DN/4200DN/4300DN Rev. 2 (added 2026-11-10 for the FS-2100D/DN; p. A-14 and
+  A-16 give MP tray 70–216 × 148–356 mm and an FS-2100D/DN cassette minimum of 140 × 210 mm, the same as the P-4030DN):
+  https://www.kyoceradocumentsolutions.eu/content/dam/download-center-cf/eu/documents/usermanual/FS_2100D_2100DN_4100DN_4200DN_4300DN_OG__ENG__Rev_2_pdf.download.pdf
 * EU declarations of conformity with OEM statements: UTAX P-4030D(N) family (media 113308), TA P-4531DN
   (media 113456), TA/UTAX P-5032DN family Rev 4 (media 113790).
 * Discrepancy noted: the TA P-5032DN datasheet/web data give an MP-tray minimum length of 139.7 mm and Kyocera

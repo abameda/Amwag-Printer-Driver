@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "configVersion": "2026.11.05-1",
+  "configVersion": "2026.11.10-1",
   "ticket": {
     "formName": "AMWAG Ticket",
     "width": 3.27,
@@ -119,6 +119,64 @@
       "cassetteRange": { "minWidth": 105, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
       "specSource": "TA English operation guide P-4532DN/P-5032DN/P-5532DN Rev 1 p.11-21; KXv4 property bag utlp13920.bag; KX 8.7 UTLP13920.XML",
       "notes": "Only USBPRINT/WSDPRINT IDs exist in the official INFs (TA_UTAXP-5032DNEED0). The vendor installer database (KmInstall4.ini) also lists UTAX_TAP-5032DNC673 for some units, hence the second IEEE 1284 pair (from vendor data, not the INF). The driver defaults to two-sided printing; the tool forces single-sided. The XPS package has a PrinterDriverID defect for this model; the PCL6 package is used. Kyocera equivalent: ECOSYS P3150dn."
+    },
+    {
+      "id": "FS-2100DN",
+      "displayName": "Kyocera FS-2100DN",
+      "hardwareIds": [
+        "USBPRINT\\KyoceraFS-2100DNC23C",
+        "WSDPRINT\\KyoceraFS-2100DNC23C",
+        "LPTENUM\\KyoceraFS-2100DNC23C"
+      ],
+      "ieee1284Ids": [
+        { "manufacturer": "Kyocera", "model": "FS-2100DN" }
+      ],
+      "networkModelNames": [ "FS-2100DN" ],
+      "acceptedDrivers": [
+        { "name": "Kyocera FS-2100DN v4 KX (PCL6)" },
+        { "name": "Kyocera FS-2100DN v4 KX (XPS)" },
+        { "name": "Kyocera FS-2100DN KX", "listsWindowsForms": false }
+      ],
+      "preferredDriverName": "Kyocera FS-2100DN v4 KX (PCL6)",
+      "driverPackageId": "kyocera-kxv4-6.2.2215-pcl6",
+      "ticketPaperSource": {
+        "binIds": [ 4 ],
+        "binNames": [ "MP Tray", "Multipurpose tray" ],
+        "requiredForTicket": true
+      },
+      "multipurposeTrayRange": { "minWidth": 70, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "cassetteRange": { "minWidth": 140, "minHeight": 210, "maxWidth": 216, "maxHeight": 356 },
+      "specSource": "Kyocera operation guide FS-2100D/2100DN/4100DN/4200DN/4300DN Rev.2 p.A-14/A-16; KXv4 6.2.2215 GPD kmfs2100npcl6.gpd",
+      "notes": "Hardware IDs and v4 driver names verified in the official Kyocera KXv4 6.2.2215 INF (PCL Driver/64bit prnkycl1.inf [Kyocera.NTamd64]); the v3 name 'Kyocera FS-2100DN KX' in the Kyocera KX 6.2.1113 INF. IEEE 1284 MFG/MDL split inferred from the hardware ID (Kyocera + FS-2100DN). networkModelNames is the vendor installer's SNMP model id (KmInstall4.ini, USB VID_0482&PID_049d), not yet confirmed on hardware. TA/UTAX twin of the P-4030DN: its GPD is identical to utlp2100npcl6.gpd except names and version (MP tray = option Manual, OptionID 4; custom size 70 x 148 to 216 x 356 mm). The ticket is narrower than the cassette minimum (140 mm), so only the MP tray can feed it."
+    },
+    {
+      "id": "FS-2100D",
+      "displayName": "Kyocera FS-2100D",
+      "hardwareIds": [
+        "USBPRINT\\KyoceraFS-2100D7D49",
+        "WSDPRINT\\KyoceraFS-2100D7D49",
+        "LPTENUM\\KyoceraFS-2100D7D49"
+      ],
+      "ieee1284Ids": [
+        { "manufacturer": "Kyocera", "model": "FS-2100D" }
+      ],
+      "networkModelNames": [ "FS-2100D" ],
+      "acceptedDrivers": [
+        { "name": "Kyocera FS-2100D v4 KX (PCL6)" },
+        { "name": "Kyocera FS-2100D v4 KX (XPS)" },
+        { "name": "Kyocera FS-2100D KX", "listsWindowsForms": false }
+      ],
+      "preferredDriverName": "Kyocera FS-2100D v4 KX (PCL6)",
+      "driverPackageId": "kyocera-kxv4-6.2.2215-pcl6",
+      "ticketPaperSource": {
+        "binIds": [ 4 ],
+        "binNames": [ "MP Tray", "Multipurpose tray" ],
+        "requiredForTicket": true
+      },
+      "multipurposeTrayRange": { "minWidth": 70, "minHeight": 148, "maxWidth": 216, "maxHeight": 356 },
+      "cassetteRange": { "minWidth": 140, "minHeight": 210, "maxWidth": 216, "maxHeight": 356 },
+      "specSource": "Kyocera operation guide FS-2100D/2100DN/4100DN/4200DN/4300DN Rev.2 p.A-14/A-16; KXv4 6.2.2215 GPD kmfs2100pcl6.gpd",
+      "notes": "The non-network FS-2100 (USB; network only with an optional interface card). Hardware IDs and v4 driver names verified in the official Kyocera KXv4 6.2.2215 INF (PCL Driver/64bit prnkycl1.inf [Kyocera.NTamd64]); the v3 name 'Kyocera FS-2100D KX' in the Kyocera KX 6.2.1113 INF. networkModelNames is the vendor installer's SNMP model id (KmInstall4.ini, USB VID_0482&PID_049c), not yet confirmed on hardware. TA/UTAX twin of the P-4030D; same paper path as the FS-2100DN (GPD identical to utlp2100pcl6.gpd except names, version and one optional-cassette constraint). Only the MP tray can feed the ticket."
     }
   ],
   "driverPackages": [
@@ -145,6 +203,30 @@
       "approvedBy": "Initial manifest, verified 2026-11-03 (IT to countersign)",
       "verifiedOn": "2026-11-03",
       "notes": "Listed with the same URL on the TA P-4030DN, P-4531DN and P-5032DN pages and the UTAX pages. Size and SHA-256 independently re-verified from two downloads. Catalog prnkycl1.cat is WHQL (Microsoft Windows Hardware Compatibility Publisher), timestamped, valid for Windows 10.0. Covers all three models for x64 under [UTAX/TA.NTamd64]."
+    },
+    {
+      "id": "kyocera-kxv4-6.2.2215-pcl6",
+      "displayName": "Kyocera KX v4 Printer Driver 6.2.2215 - PCL6 driver",
+      "publisher": "Kyocera Document Solutions",
+      "version": "6.2.2215",
+      "infDriverVer": "10/15/2024,6.2.2215.0",
+      "driverType": "Windows v4 printer driver (GPD-based, XPS to PCL XL filter), WHQL-signed",
+      "sourcePage": "https://www.kyoceradocumentsolutions.eu/en/support/downloads.name-L2V1L2VuL3ByaW50ZXJzL0VDT1NZU1AzMDQ1RE4=.html",
+      "downloadUrl": "https://www.kyoceradocumentsolutions.eu/content/dam/download-center-cf/eu/drivers/all/Kxv4Driver_signed_zip.download.zip",
+      "fileName": "Kxv4Driver_signed.zip",
+      "sizeBytes": 177216574,
+      "sha256": "A051995772043082A41E33E4E3C7D9DD197D7C852CC93B32D0360421B427BE83",
+      "environment": "Windows x64",
+      "architecture": "x64",
+      "infPath": "en/PrnDrv/PCL Driver/64bit/win81 and newer/prnkycl1.inf",
+      "catalogPath": "en/PrnDrv/PCL Driver/64bit/win81 and newer/prnkycl1.cat",
+      "trustedSigners": [ "Microsoft Windows Hardware Compatibility Publisher" ],
+      "supportedOs": [ "Windows 10 x64", "Windows 11 x64" ],
+      "minOsBuild": 10240,
+      "approved": true,
+      "approvedBy": "Added 2026-11-10 for the Kyocera FS-2100D/DN (IT to countersign)",
+      "verifiedOn": "2026-11-10",
+      "notes": "Kyocera Europe download centre, 'KX v4 Printer Driver (v.6.2.2215)', served as Kxv4Driver_signed.zip (no redirect). The URL carries no version: when Kyocera publishes a newer build there, its SHA-256 no longer matches and the online download is refused, so ship this archive in the distribution's drivers folder. Catalog prnkycl1.cat is WHQL (Microsoft Windows Hardware Compatibility Publisher), timestamped, valid for Windows 10.0 x64. Covers FS-2100D and FS-2100DN for x64 under [Kyocera.NTamd64]; each manifest's PrinterDriverID matches its INF line."
     },
     {
       "id": "ta-kx-8.7.0917",

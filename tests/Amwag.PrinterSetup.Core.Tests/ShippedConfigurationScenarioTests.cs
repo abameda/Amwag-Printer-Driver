@@ -24,14 +24,43 @@ public sealed class ShippedConfigurationScenarioTests
         Assert.True(Shipped().Ticket.DimensionsConfirmed);
     }
 
+    [Fact]
+    public void Shipped_configuration_is_valid()
+    {
+        var (errors, warnings) = ConfigLoader.Check(Shipped());
+
+        Assert.Empty(errors);
+        Assert.Empty(warnings);
+    }
+
+    /// <summary>An unbound USB device node reporting the model's own USBPRINT hardware ID and IEEE 1284 MFG+MDL from the shipped manifest.</summary>
+    private static PnpPrinterDevice UsbDevice(ModelDefinition model)
+    {
+        const string Enumerator = @"USBPRINT\";
+        string hardwareId = model.HardwareIds.First(id => id.StartsWith(Enumerator, StringComparison.OrdinalIgnoreCase));
+        var ieee1284 = model.Ieee1284Ids[0];
+        return SampleConfig.UsbDevice(SampleConfig.P4030, driverBound: false) with
+        {
+            InstanceId = $@"{hardwareId}\7&2B5A1C3&0&VCF5X01234",
+            HardwareIds = [hardwareId, hardwareId[Enumerator.Length..]],
+            CompatibleIds = [Enumerator + ieee1284.Manufacturer + ieee1284.Model, "GENPRINT"],
+            FriendlyName = model.DisplayName,
+            Description = model.DisplayName,
+        };
+    }
+
     [Theory]
     [InlineData(SampleConfig.P4030)]
     [InlineData(SampleConfig.P4531)]
     [InlineData(SampleConfig.P5032)]
+    [InlineData("FS-2100DN")]
+    [InlineData("FS-2100D")]
     public void Usb_printer_is_installed_and_configured_with_the_shipped_manifest(string modelId)
     {
         var shipped = Shipped();
-        var scenario = new ScenarioBuilder().WithConfig(_ => shipped).WithUsbPrinter(modelId, driverBound: false).Build();
+        var builder = new ScenarioBuilder().WithConfig(_ => shipped).WithDevice(UsbDevice(shipped.FindModel(modelId)!));
+        builder.Spooler.SeedUsbPort("USB001");
+        var scenario = builder.Build();
 
         var run = scenario.Run();
 
@@ -74,6 +103,40 @@ public sealed class ShippedConfigurationScenarioTests
         Assert.Equal((SampleConfig.P5032, MatchConfidence.Exact), (p5032.Model?.Id, p5032.Confidence));
         var p4030 = detection.Candidates.Single(c => c.NetworkAddress == "10.0.0.22");
         Assert.Equal((SampleConfig.P4030, MatchConfidence.Exact), (p4030.Model?.Id, p4030.Confidence));
+    }
+
+    [Fact]
+    public void Kyocera_fs_2100d_and_fs_2100dn_are_told_apart_on_the_network()
+    {
+        var scenario = new ScenarioBuilder()
+            .WithConfig(_ => Shipped())
+            .WithNetworkIdentity(new NetworkIdentity
+            {
+                Address = "10.0.0.23",
+                RawPortReachable = true,
+                SnmpResponded = true,
+                SysDescr = "KYOCERA Document Solutions Printing System",
+                SysObjectId = "1.3.6.1.4.1.1347.41",
+                DeviceDescription = "FS-2100DN",
+                Ieee1284DeviceId = "MFG:Kyocera;CMD:PCLXL,PostScript Emulation,PCL5E,PJL;MDL:FS-2100DN;CLS:PRINTER;DES:Kyocera FS-2100DN;",
+            })
+            .WithNetworkIdentity(new NetworkIdentity
+            {
+                Address = "10.0.0.24",
+                RawPortReachable = true,
+                SnmpResponded = true,
+                SysDescr = "KYOCERA Document Solutions Printing System",
+                SysObjectId = "1.3.6.1.4.1.1347.41",
+                VendorModelName = "FS-2100D",
+            })
+            .Build();
+
+        var detection = scenario.CreateSession().Detect(new DetectRequest { NetworkAddresses = ["10.0.0.23", "10.0.0.24"] }, default);
+
+        var dn = detection.Candidates.Single(c => c.NetworkAddress == "10.0.0.23");
+        Assert.Equal(("FS-2100DN", MatchConfidence.Exact), (dn.Model?.Id, dn.Confidence));
+        var d = detection.Candidates.Single(c => c.NetworkAddress == "10.0.0.24");
+        Assert.Equal(("FS-2100D", MatchConfidence.Exact), (d.Model?.Id, d.Confidence));
     }
 
     [Fact]
