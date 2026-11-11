@@ -6,8 +6,9 @@
     1. Restores and builds the solution.
     2. Runs the automated tests (hardware-independent unit tests and read-only Windows checks).
     3. Publishes "AMWAG Printer Setup.exe" (self-contained: no .NET install needed on branch PCs).
-    4. Copies the deployment configuration and every approved offline driver archive found in .\drivers
-       after re-checking its size and SHA-256 against the manifest (a mismatching archive stops the build).
+    4. Copies the deployment configuration and the offline driver archive of every package a printer model uses,
+       found in .\drivers, after re-checking its size and SHA-256 against the manifest (a mismatching archive stops
+       the build).
     5. Copies the IT documentation, writes SHA256SUMS.txt and zips the distribution folder.
     6. Zips it once more without the driver archives: the much smaller online package.
 
@@ -81,7 +82,9 @@ if (-not $config.ticket.dimensionsConfirmed) {
 
 if (-not $NoDrivers) {
     $driverTarget = Join-Path $stage 'drivers'
-    foreach ($package in $config.driverPackages) {
+    # Only packages a model installs: an approved alternative that no model names is never downloaded or installed.
+    $usedPackageIds = @($config.models | ForEach-Object { $_.driverPackageId })
+    foreach ($package in $config.driverPackages | Where-Object { $usedPackageIds -contains $_.id }) {
         $archive = Join-Path $driverSource $package.fileName
         if (-not (Test-Path $archive)) {
             Write-Warning "Offline driver archive not found: $archive. Branch PCs will download '$($package.id)' from the approved URL when needed."
